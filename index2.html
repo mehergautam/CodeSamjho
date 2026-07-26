@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>CodeSutra — Paste your code. Understand every step.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  :root{
+    --bg:#0a0a12; --panel:#12121c; --panel-2:#15151f; --border:#23232f; --border-soft:#1c1c28;
+    --text:#e8e8f0; --text-dim:#8a8a9c; --text-faint:#55556a;
+    --violet:#7c5cff; --pink:#d84fd0; --blue:#4fa3ff; --green:#3ddc97; --amber:#f0b94a; --red:#ef5d7a; --cyan:#4fd8e8;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, #2a1f5a30, transparent 60%),
+      radial-gradient(ellipse 900px 600px at 90% 10%, #1f2f5a2a, transparent 60%),
+      var(--bg);
+    color:var(--text); font-family:var(--sans); min-height:100vh;
+  }
+  .wrap{max-width:1580px;margin:0 auto;padding:20px 24px 40px;}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border-soft);flex-wrap:wrap;gap:12px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 24px #7c5cff55;}
+  .brand h1{font-size:21px;margin:0;font-weight:700;letter-spacing:-0.02em;}
+  .brand h1 span{background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand p{margin:1px 0 0;font-size:12.5px;color:var(--text-dim);}
+  .hdr-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .pill{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);padding:8px 14px;border-radius:9px;font-size:13px;color:var(--text);cursor:pointer;transition:.15s;}
+  .pill:hover{border-color:#3a3a52;background:#171725;}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4a3a8a,#7c5cff);display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .grid{display:grid;grid-template-columns:360px 1fr 300px;gap:18px;align-items:start;}
+  @media (max-width:1200px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .card + .card{margin-top:18px;}
+  .card-hd{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border-soft);font-size:13.5px;font-weight:600;}
+  .card-hd .dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:2px;box-shadow:0 0 8px var(--green);}
+  .lang-select{margin-left:auto;background:#181826;border:1px solid var(--border);color:var(--text-dim);font-size:12px;padding:5px 8px;border-radius:7px;}
+
+  .tabbar{display:flex;align-items:center;gap:2px;padding:10px 10px 0;}
+  .tab{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;background:#1a1a28;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;color:var(--text);}
+  .editor-wrap{position:relative;border-top:1px solid var(--border-soft);background:var(--panel-2);}
+  .editor-flex{display:flex;}
+  .gutter{user-select:none;text-align:right;padding:14px 10px 14px 0;color:var(--text-faint);min-width:36px;border-right:1px solid var(--border-soft);font-family:var(--mono);font-size:13.5px;line-height:22px;white-space:pre;}
+  .gutter .ln.exec{color:var(--violet);font-weight:700;}
+  .code-stack{position:relative;flex:1;height:360px;overflow:auto;}
+  pre#codeHighlight{
+    margin:0;padding:14px 16px;font-family:var(--mono);font-size:13.5px;line-height:22px;
+    white-space:pre;pointer-events:none;color:var(--text);min-height:100%;
+  }
+  textarea#codeInput{
+    position:absolute;top:0;left:0;width:100%;height:100%;resize:none;border:none;outline:none;
+    background:transparent;color:transparent;caret-color:#fff;font-family:var(--mono);font-size:13.5px;
+    line-height:22px;padding:14px 16px;white-space:pre;overflow:auto;
+  }
+  .exec-hl{position:absolute;left:0;right:0;background:#7c5cff1f;box-shadow:inset 3px 0 0 var(--violet);pointer-events:none;}
+  .kw{color:#c792ea;} .type{color:#82aaff;} .str{color:#c3e88d;} .num{color:#f78c6c;} .fn{color:#82aaff;} .com{color:#5c6370;} .op{color:#89ddff;}
+
+  .runbar{display:flex;gap:10px;padding:14px 16px;flex-wrap:wrap;}
+  .btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#181826;color:var(--text);transition:.15s;}
+  .btn:hover{background:#1e1e2e;border-color:#33334a;}
+  .btn.primary{background:linear-gradient(90deg,var(--violet),#9a6cff);border:none;color:#fff;box-shadow:0 4px 18px #7c5cff44;}
+  .btn.primary:hover{filter:brightness(1.08);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .err-box{margin:0 16px 14px;padding:10px 12px;border-radius:9px;background:#ef5d7a14;border:1px solid #ef5d7a55;color:#ff9bb0;font-family:var(--mono);font-size:12.5px;display:none;}
+
+  .timeline-track{display:flex;gap:14px;padding:16px;overflow-x:auto;}
+  .tl-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;text-align:center;cursor:pointer;}
+  .tl-num{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--text-dim);background:var(--panel-2);}
+  .tl-step.done .tl-num{border-color:var(--green);color:var(--green);}
+  .tl-step.current .tl-num{border-color:var(--violet);color:#fff;background:var(--violet);box-shadow:0 0 0 4px #7c5cff2a;}
+  .tl-title{font-size:11.5px;color:var(--text);font-weight:600;}
+  .tl-sub{font-size:10.5px;color:var(--text-faint);}
+
+  .ai-body{padding:16px;}
+  .ai-body p{margin:0 0 8px;font-size:13.5px;line-height:1.6;color:#c8c8d8;}
+  .ai-body b{color:var(--text);}
+  .ai-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border-soft);color:var(--text-faint);font-size:11.5px;}
+
+  .viz-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;flex-wrap:wrap;gap:10px;}
+  .step-pill{background:#1a1a2a;border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12.5px;color:var(--text-dim);}
+  .transport{display:flex;align-items:center;gap:10px;}
+  .tbtn{width:34px;height:34px;border-radius:9px;background:#181826;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
+  .tbtn:hover{background:#1e1e2e;}
+  .tbtn.play{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--pink));border:none;box-shadow:0 4px 16px #7c5cff55;}
+  .speed{background:#181826;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text-dim);}
+
+  .stage{margin:0 18px 18px;border:1px solid var(--border-soft);border-radius:12px;background:radial-gradient(circle at 20% 20%,#7c5cff14,transparent 40%),radial-gradient(circle at 80% 70%,#d84fd014,transparent 40%),#0d0d16;padding:22px;min-height:260px;}
+  .stage-line1{font-family:var(--mono);font-size:13.5px;color:var(--text-dim);margin-bottom:22px;word-break:break-all;}
+  .stage-line1 b{color:var(--text);font-weight:400;}
+  .op-row{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:20px;flex-wrap:wrap;}
+  .opbox{min-width:76px;height:64px;padding:0 10px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:var(--mono);}
+  .opbox-label .lbl{font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-align:center;}
+  .op-sign{font-size:20px;color:var(--text-faint);font-weight:300;}
+  .b-blue{background:#4fa3ff14;border:2px solid #4fa3ff;color:#4fa3ff;}
+  .b-violet{background:#7c5cff14;border:2px solid #7c5cff;color:#a98bff;}
+  .b-green{background:#3ddc9714;border:2px solid #3ddc97;color:#3ddc97;}
+  .b-amber{background:#f0b94a14;border:2px solid #f0b94a;color:#f0b94a;}
+  .b-red{background:#ef5d7a14;border:2px solid #ef5d7a;color:#ef5d7a;}
+  .stage-note{text-align:center;color:var(--text-faint);font-size:12.5px;margin-top:6px;}
+
+  .console-body{padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--green);min-height:28px;white-space:pre-wrap;}
+  .console-body .err{color:var(--red);}
+
+  .struct-body{padding:10px 6px;font-family:var(--mono);font-size:12.5px;line-height:1.9;max-height:340px;overflow:auto;}
+  .struct-row{padding:2px 12px;border-radius:6px;color:var(--text-dim);white-space:pre;}
+  .struct-row.active{background:#7c5cff22;color:#fff;box-shadow:inset 3px 0 0 var(--violet);}
+  .struct-row .lno{color:var(--text-faint);margin-right:8px;}
+  .struct-row .kind{color:var(--cyan);}
+
+  .var-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .var-table th{text-align:left;color:var(--text-faint);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:10px 16px 8px;}
+  .var-table td{padding:8px 16px;font-family:var(--mono);border-top:1px solid var(--border-soft);word-break:break-all;}
+  .var-table tr.changed td:first-child{color:var(--cyan);font-weight:700;}
+  .var-table td:first-child{color:var(--text);font-weight:600;}
+  .var-table td:nth-child(2){color:var(--amber);}
+  .var-table td:nth-child(3){color:var(--text-faint);}
+  .var-empty{padding:14px 16px;color:var(--text-faint);font-size:12.5px;}
+
+  .stack-frame{margin:12px 16px;padding:10px 14px;border-radius:10px;background:#7c5cff14;border:1px solid #7c5cff55;}
+  .stack-frame .fname{color:#a98bff;font-family:var(--mono);font-weight:700;font-size:13px;}
+  .stack-frame .fline{color:var(--text-faint);font-size:11px;margin-top:2px;}
+
+  .mem-row{display:flex;justify-content:space-between;padding:9px 16px;font-family:var(--mono);font-size:13px;border-top:1px solid var(--border-soft);}
+  .mem-row .k{color:var(--cyan);font-weight:700;} .mem-row .v{color:var(--amber);} .mem-row .t{color:var(--text-faint);}
+
+  .qa-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;cursor:pointer;border-top:1px solid var(--border-soft);}
+  .qa-item:hover{background:#171724;}
+
+  footer.status{display:flex;align-items:center;justify-content:space-between;padding:14px 4px 0;margin-top:6px;color:var(--text-faint);font-size:12px;flex-wrap:wrap;gap:8px;}
+  footer.status .ready{color:var(--green);display:flex;align-items:center;gap:6px;}
+  footer.status .ready::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+  footer.status.err .ready{color:var(--red);}
+  footer.status.err .ready::before{background:var(--red);box-shadow:0 0 6px var(--red);}
+  footer.status .right{display:flex;gap:18px;flex-wrap:wrap;}
+  .note{font-size:11.5px;color:var(--text-faint);padding:0 16px 12px;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  /* ================= Motion layer ================= */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+  .bg-particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .bg-particles span{position:absolute;width:3px;height:3px;border-radius:50%;background:#7c5cff;opacity:.35;animation:floatUp linear infinite;}
+  @keyframes floatUp{ 0%{ transform:translateY(0) translateX(0); opacity:0;} 10%{opacity:.35;} 90%{opacity:.35;} 100%{ transform:translateY(-110vh) translateX(20px); opacity:0;} }
+  .wrap{position:relative;z-index:1;}
+
+  @keyframes popIn{ 0%{ opacity:0; transform:scale(.85) translateY(6px);} 60%{ opacity:1; transform:scale(1.04) translateY(-1px);} 100%{ opacity:1; transform:scale(1) translateY(0);} }
+  @keyframes valueFlip{ 0%{ opacity:0; transform:translateY(10px);} 100%{ opacity:1; transform:translateY(0);} }
+  @keyframes glowPulse{ 0%{ box-shadow:0 0 0 0 currentColor;} 50%{ box-shadow:0 0 22px 2px currentColor;} 100%{ box-shadow:0 0 0 0 transparent;} }
+  @keyframes rowFlash{ 0%{ background:#7c5cff33;} 100%{ background:transparent;} }
+  @keyframes stackIn{ 0%{ opacity:0; transform:translateX(-14px) scale(.94);} 100%{ opacity:1; transform:translateX(0) scale(1);} }
+  @keyframes condTrue{ 0%{ transform:scale(.8); opacity:0;} 60%{ transform:scale(1.08); opacity:1;} 100%{ transform:scale(1); opacity:1;} }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes execGlow{ 0%{ box-shadow:inset 3px 0 0 var(--violet), 0 0 0 rgba(124,92,255,0);} 40%{ box-shadow:inset 3px 0 0 var(--violet), 0 0 14px rgba(124,92,255,.35);} 100%{ box-shadow:inset 3px 0 0 var(--violet), 0 0 0 rgba(124,92,255,0);} }
+  @keyframes shimmer{ 0%{ background-position:-200px 0;} 100%{ background-position:200px 0;} }
+
+  .opbox{ animation:popIn .38s cubic-bezier(.34,1.56,.64,1); transition:transform .2s; }
+  .opbox.glow-green{ color:var(--green); animation:popIn .38s cubic-bezier(.34,1.56,.64,1), glowPulse .7s ease-out; }
+  .opbox.glow-red{ color:var(--red); animation:popIn .38s cubic-bezier(.34,1.56,.64,1), glowPulse .7s ease-out, shake .4s ease; }
+  .opbox.glow-blue{ animation:popIn .38s cubic-bezier(.34,1.56,.64,1), glowPulse .7s ease-out; color:var(--blue); }
+  .var-table tr{ transition:background .3s; }
+  .var-table tr.changed{ animation:rowFlash 1s ease-out; }
+  .var-table tr.changed td:nth-child(2){ display:inline-block; animation:valueFlip .3s ease-out; }
+  .stack-frame{ animation:stackIn .32s cubic-bezier(.34,1.56,.64,1); transition:transform .2s; }
+  .stack-frame:hover{ transform:translateX(3px); }
+  .cond-card{ display:inline-flex; align-items:center; gap:10px; padding:14px 22px; border-radius:12px; font-family:var(--mono); font-size:18px; font-weight:700; animation:condTrue .4s cubic-bezier(.34,1.56,.64,1); }
+  .cond-card.t{ background:#3ddc9714; border:2px solid var(--green); color:var(--green); }
+  .cond-card.f{ background:#ef5d7a14; border:2px solid var(--red); color:var(--red); animation:condTrue .4s cubic-bezier(.34,1.56,.64,1), shake .4s ease .1s; }
+  .tl-step{ transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s; opacity:.55; }
+  .tl-step.done{ opacity:.85; }
+  .tl-step.current{ opacity:1; transform:scale(1.14); }
+  .tl-num{ transition:all .25s cubic-bezier(.34,1.56,.64,1); }
+  .exec-flash{ animation:execGlow .5s ease-out; }
+  .console-line{ animation:valueFlip .25s ease-out; }
+  .console-line.err{ animation:valueFlip .25s ease-out, shake .4s ease; }
+  .caret{ display:inline-block; width:7px; background:var(--green); animation:caretBlink 1s step-end infinite; }
+  @keyframes caretBlink{ 50%{opacity:0;} }
+  .btn{ transition:transform .12s ease, box-shadow .12s ease, background .15s; }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); }
+  .btn:active{ transform:translateY(0) scale(.96); }
+  .btn.primary:hover{ box-shadow:0 8px 24px #7c5cff66; }
+  .card{ transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .pill{ transition:transform .15s ease; }
+  .pill:hover{ transform:translateY(-1px); }
+  .tbtn{ transition:transform .12s ease, background .15s; }
+  .tbtn:hover{ transform:translateY(-2px) scale(1.05); }
+  .tbtn:active{ transform:scale(.92); }
+  .tbtn.play:hover{ box-shadow:0 6px 20px #7c5cff77; }
+  .skeleton{ background:linear-gradient(90deg,#171724 25%,#20202f 37%,#171724 63%); background-size:400px 100%; animation:shimmer 1.2s linear infinite; border-radius:8px; }
+</style>
+</head>
+<body>
+<div class="bg-particles" id="bgParticles"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">⟨/⟩</div>
+      <div><h1>Code<span>Sutra</span></h1><p>Paste your code. Understand every step.</p></div>
+    </div>
+    <div class="hdr-actions">
+      <div class="pill">JavaScript ▾</div>
+      <div class="pill" id="btnExamples">⚑ Examples</div>
+      <div class="pill">◐ Theme</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="tabbar"><div class="tab">main.js ✕</div></div>
+        <div class="editor-wrap">
+          <div class="editor-flex">
+            <div class="gutter" id="gutter"></div>
+            <div class="code-stack">
+              <div class="exec-hl" id="execHl" style="display:none;"></div>
+              <pre id="codeHighlight"></pre>
+              <textarea id="codeInput" spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="err-box" id="errBox"></div>
+        <div class="runbar">
+          <div class="btn primary" id="btnRun">▶ Run</div>
+          <div class="btn" id="btnOver">⤵ Step Over</div>
+          <div class="btn" id="btnInto">⤷ Step Into</div>
+          <div class="btn" id="btnReset">↺ Reset</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="dot"></span>Execution Timeline</div>
+        <div class="timeline-track" id="timeline"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">✦ AI Explanation</div>
+        <div class="ai-body" id="aiBody"><p>Click <b>Run</b> to execute your code and see a step-by-step explanation here.</p></div>
+        <div class="ai-foot"><span>Rule-based explanations (auto-generated from the trace)</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="viz-topbar">
+          <div class="step-pill" id="stepPill">Step 0 of 0</div>
+          <div class="transport">
+            <div class="tbtn" id="tPrev">⏮</div>
+            <div class="tbtn play" id="tPlay">▶</div>
+            <div class="tbtn" id="tNext">⏭</div>
+            <div class="speed">1x</div>
+          </div>
+        </div>
+        <div class="stage" id="stage">
+          <div class="stage-line1">Executing: <span id="execLine">—</span></div>
+          <div id="opRowWrap"></div>
+          <div class="stage-note" id="stageNote"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Console Output</div>
+        <div class="console-body" id="consoleBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Code Structure <span style="color:var(--text-faint);font-weight:400;font-size:11.5px;margin-left:6px;">(live, derived from your actual AST)</span></div>
+        <div class="struct-body" id="structBody"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-hd">Variables</div>
+        <table class="var-table"><thead><tr><th>Name</th><th>Value</th><th>Type</th></tr></thead><tbody id="varsBody"></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-hd">☰ Call Stack</div>
+        <div id="stackBody"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">▤ Memory (Stack)</div>
+        <div id="memBody"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">Quick Actions</div>
+        <div class="qa-item" id="qaDownload"><span>⇩</span>Download Code</div>
+        <div class="qa-item" id="qaShare"><span>⇪</span>Copy Trace JSON</div>
+        <div class="qa-item" id="qaExample2"><span>⌗</span>Load Recursion Example</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="status" id="statusBar">
+    <div class="ready" id="readyLabel">Ready</div>
+    <div class="right">
+      <span id="lineCount">Lines: 0</span>
+      <span id="charCount">Characters: 0</span>
+      <span id="stepCount">Steps: 0</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   REAL EXECUTION ENGINE — Lexer -> Parser -> Interpreter
+   Supported: let/const/var, numbers/strings/booleans/arrays,
+   arithmetic/comparison/logical ops, if/else if/else,
+   for/while/do-while, functions + return + recursion,
+   arrays + indexing, console.log
+   ========================================================= */
+
+const KEYWORDS = new Set(['let','const','var','if','else','for','while','do','function','return','true','false','null','break','continue']);
+
+function tokenize(src){
+  const tokens = [];
+  let i = 0, line = 1;
+  const n = src.length;
+  const isDigit = c => c >= '0' && c <= '9';
+  const isIdentStart = c => /[A-Za-z_$]/.test(c);
+  const isIdentPart = c => /[A-Za-z0-9_$]/.test(c);
+
+  while(i < n){
+    let c = src[i];
+    if(c === '\n'){ line++; i++; continue; }
+    if(c === ' ' || c === '\t' || c === '\r'){ i++; continue; }
+    if(c === '/' && src[i+1] === '/'){ while(i<n && src[i] !== '\n') i++; continue; }
+    if(c === '/' && src[i+1] === '*'){ i+=2; while(i<n && !(src[i]==='*'&&src[i+1]==='/')){ if(src[i]==='\n') line++; i++; } i+=2; continue; }
+    if(c === '"' || c === "'"){
+      const quote = c; let j = i+1; let s = '';
+      while(j<n && src[j] !== quote){ if(src[j]==='\\'){ s+=src[j+1]; j+=2; continue; } s += src[j]; j++; }
+      tokens.push({type:'str', value:s, line}); i = j+1; continue;
+    }
+    if(isDigit(c) || (c==='.' && isDigit(src[i+1]))){
+      let j=i; let s='';
+      while(j<n && (isDigit(src[j]) || src[j]==='.')){ s+=src[j]; j++; }
+      tokens.push({type:'num', value:parseFloat(s), line}); i=j; continue;
+    }
+    if(isIdentStart(c)){
+      let j=i; let s='';
+      while(j<n && isIdentPart(src[j])){ s+=src[j]; j++; }
+      tokens.push({type: KEYWORDS.has(s) ? 'kw' : 'ident', value:s, line}); i=j; continue;
+    }
+    const three = src.slice(i,i+3);
+    const two = src.slice(i,i+2);
+    if(['===','!=='].includes(three)){ tokens.push({type:'op',value:three,line}); i+=3; continue; }
+    if(['==','!=','<=','>=','&&','||','++','--','+=','-=','*=','/=','%='].includes(two)){ tokens.push({type:'op',value:two,line}); i+=2; continue; }
+    if('+-*/%<>=!'.includes(c)){ tokens.push({type:'op',value:c,line}); i++; continue; }
+    if('(){}[],;.:'.includes(c)){ tokens.push({type:'punc',value:c,line}); i++; continue; }
+    throw new SyntaxError(`Unexpected character '${c}' at line ${line}`);
+  }
+  tokens.push({type:'eof', value:null, line});
+  return tokens;
+}
+
+class Parser{
+  constructor(tokens){ this.toks = tokens; this.pos = 0; }
+  peek(o=0){ return this.toks[this.pos+o]; }
+  next(){ return this.toks[this.pos++]; }
+  at(type,value){ const t=this.peek(); return t.type===type && (value===undefined || t.value===value); }
+  expect(type,value){
+    if(!this.at(type,value)) throw new SyntaxError(`Expected '${value||type}' but got '${this.peek().value}' at line ${this.peek().line}`);
+    return this.next();
+  }
+  parseProgram(){
+    const body=[];
+    while(!this.at('eof')) body.push(this.parseStatement());
+    return {type:'Program', body};
+  }
+  parseStatement(){
+    const t = this.peek();
+    if(t.type==='kw' && (t.value==='let'||t.value==='const'||t.value==='var')) return this.parseVarDecl(true);
+    if(t.type==='kw' && t.value==='if') return this.parseIf();
+    if(t.type==='kw' && t.value==='for') return this.parseFor();
+    if(t.type==='kw' && t.value==='while') return this.parseWhile();
+    if(t.type==='kw' && t.value==='do') return this.parseDoWhile();
+    if(t.type==='kw' && t.value==='function') return this.parseFuncDecl();
+    if(t.type==='kw' && t.value==='return') return this.parseReturn();
+    if(t.type==='kw' && t.value==='break'){ this.next(); this.consumeSemi(); return {type:'BreakStatement', line:t.line}; }
+    if(t.type==='kw' && t.value==='continue'){ this.next(); this.consumeSemi(); return {type:'ContinueStatement', line:t.line}; }
+    if(t.type==='punc' && t.value==='{') return this.parseBlock();
+    return this.parseExprStatement();
+  }
+  consumeSemi(){ if(this.at('punc',';')) this.next(); }
+  parseVarDecl(consumeSemiAfter){
+    const kindTok = this.next(); const line = kindTok.line;
+    const decls = [];
+    do{
+      const idTok = this.expect('ident');
+      let init = null;
+      if(this.at('op','=')){ this.next(); init = this.parseAssign(); }
+      decls.push({id:idTok.value, init});
+    } while(this.at('punc',',') && this.next());
+    if(consumeSemiAfter) this.consumeSemi();
+    return {type:'VarDeclaration', kind:kindTok.value, decls, line};
+  }
+  parseBlock(){
+    this.expect('punc','{');
+    const body=[];
+    while(!this.at('punc','}')) body.push(this.parseStatement());
+    this.expect('punc','}');
+    return {type:'Block', body};
+  }
+  parseIf(){
+    const line=this.next().line;
+    this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')');
+    const cons = this.parseStatement();
+    let alt=null;
+    if(this.at('kw','else')){ this.next(); alt = this.at('kw','if') ? this.parseIf() : this.parseStatement(); }
+    return {type:'If', test, cons, alt, line};
+  }
+  parseFor(){
+    const line=this.next().line;
+    this.expect('punc','(');
+    let init=null;
+    if(!this.at('punc',';')){
+      init = (this.at('kw','let')||this.at('kw','const')||this.at('kw','var')) ? this.parseVarDecl(false) : {type:'ExprStatement', expr:this.parseExpr(), line:this.peek().line};
+    }
+    this.expect('punc',';');
+    let test=null; if(!this.at('punc',';')) test=this.parseExpr();
+    this.expect('punc',';');
+    let update=null; if(!this.at('punc',')')) update=this.parseExpr();
+    this.expect('punc',')');
+    const body=this.parseStatement();
+    return {type:'For', init, test, update, body, line};
+  }
+  parseWhile(){
+    const line=this.next().line;
+    this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')');
+    const body=this.parseStatement();
+    return {type:'While', test, body, line};
+  }
+  parseDoWhile(){
+    const line=this.next().line;
+    const body=this.parseStatement();
+    this.expect('kw','while'); this.expect('punc','(');
+    const test=this.parseExpr();
+    this.expect('punc',')'); this.consumeSemi();
+    return {type:'DoWhile', test, body, line};
+  }
+  parseFuncDecl(){
+    const line=this.next().line;
+    const name=this.expect('ident').value;
+    this.expect('punc','(');
+    const params=[];
+    if(!this.at('punc',')')){
+      do{ params.push(this.expect('ident').value); } while(this.at('punc',',') && this.next());
+    }
+    this.expect('punc',')');
+    const body=this.parseBlock();
+    return {type:'FuncDecl', name, params, body, line};
+  }
+  parseReturn(){
+    const line=this.next().line;
+    let arg=null;
+    if(!this.at('punc',';') && !this.at('punc','}')) arg=this.parseExpr();
+    this.consumeSemi();
+    return {type:'Return', arg, line};
+  }
+  parseExprStatement(){
+    const line=this.peek().line;
+    const expr=this.parseExpr();
+    this.consumeSemi();
+    return {type:'ExprStatement', expr, line};
+  }
+  parseExpr(){ return this.parseAssign(); }
+  parseAssign(){
+    const left = this.parseLogicalOr();
+    if(this.at('op') && ['=','+=','-=','*=','/=','%='].includes(this.peek().value)){
+      const op = this.next().value;
+      const right = this.parseAssign();
+      return {type:'Assign', op, left, right, line:left.line};
+    }
+    return left;
+  }
+  parseLogicalOr(){
+    let left=this.parseLogicalAnd();
+    while(this.at('op','||')){ this.next(); const right=this.parseLogicalAnd(); left={type:'Logical',op:'||',left,right,line:left.line}; }
+    return left;
+  }
+  parseLogicalAnd(){
+    let left=this.parseEquality();
+    while(this.at('op','&&')){ this.next(); const right=this.parseEquality(); left={type:'Logical',op:'&&',left,right,line:left.line}; }
+    return left;
+  }
+  parseEquality(){
+    let left=this.parseRelational();
+    while(this.at('op') && ['==','!=','===','!=='].includes(this.peek().value)){
+      const op=this.next().value; const right=this.parseRelational();
+      left={type:'Binary',op,left,right,line:left.line};
+    }
+    return left;
+  }
+  parseRelational(){
+    let left=this.parseAdditive();
+    while(this.at('op') && ['<','>','<=','>='].includes(this.peek().value)){
+      const op=this.next().value; const right=this.parseAdditive();
+      left={type:'Binary',op,left,right,line:left.line};
+    }
+    return left;
+  }
+  parseAdditive(){
+    let left=this.parseMultiplicative();
+    while(this.at('op') && ['+','-'].includes(this.peek().value)){
+      const op=this.next().value; const right=this.parseMultiplicative();
+      left={type:'Binary',op,left,right,line:left.line};
+    }
+    return left;
+  }
+  parseMultiplicative(){
+    let left=this.parseUnary();
+    while(this.at('op') && ['*','/','%'].includes(this.peek().value)){
+      const op=this.next().value; const right=this.parseUnary();
+      left={type:'Binary',op,left,right,line:left.line};
+    }
+    return left;
+  }
+  parseUnary(){
+    if(this.at('op') && ['!','-','+'].includes(this.peek().value)){
+      const op=this.next().value; const arg=this.parseUnary();
+      return {type:'Unary',op,arg,line:arg.line};
+    }
+    if(this.at('op','++') || this.at('op','--')){
+      const op=this.next().value; const arg=this.parseUnary();
+      return {type:'Update',op,arg,prefix:true,line:arg.line};
+    }
+    return this.parsePostfix();
+  }
+  parsePostfix(){
+    let node=this.parsePrimary();
+    while(true){
+      if(this.at('punc','.')){
+        this.next(); const prop=this.expect('ident').value;
+        node={type:'Member',object:node,property:{type:'Literal',value:prop},computed:false,line:node.line};
+      } else if(this.at('punc','[')){
+        this.next(); const prop=this.parseExpr(); this.expect('punc',']');
+        node={type:'Member',object:node,property:prop,computed:true,line:node.line};
+      } else if(this.at('punc','(')){
+        this.next(); const args=[];
+        if(!this.at('punc',')')){ do{ args.push(this.parseAssign()); } while(this.at('punc',',') && this.next()); }
+        this.expect('punc',')');
+        node={type:'Call',callee:node,args,line:node.line};
+      } else if(this.at('op','++') || this.at('op','--')){
+        const op=this.next().value;
+        node={type:'Update',op,arg:node,prefix:false,line:node.line};
+      } else break;
+    }
+    return node;
+  }
+  parsePrimary(){
+    const t=this.peek();
+    if(t.type==='num'){ this.next(); return {type:'Literal',value:t.value,line:t.line}; }
+    if(t.type==='str'){ this.next(); return {type:'Literal',value:t.value,line:t.line}; }
+    if(t.type==='kw' && t.value==='true'){ this.next(); return {type:'Literal',value:true,line:t.line}; }
+    if(t.type==='kw' && t.value==='false'){ this.next(); return {type:'Literal',value:false,line:t.line}; }
+    if(t.type==='kw' && t.value==='null'){ this.next(); return {type:'Literal',value:null,line:t.line}; }
+    if(t.type==='ident'){ this.next(); return {type:'Ident',name:t.value,line:t.line}; }
+    if(t.type==='punc' && t.value==='('){ this.next(); const e=this.parseExpr(); this.expect('punc',')'); return e; }
+    if(t.type==='punc' && t.value==='['){
+      this.next(); const elements=[];
+      if(!this.at('punc',']')){ do{ elements.push(this.parseAssign()); } while(this.at('punc',',') && this.next()); }
+      this.expect('punc',']');
+      return {type:'ArrayLit', elements, line:t.line};
+    }
+    throw new SyntaxError(`Unexpected token '${t.value}' at line ${t.line}`);
+  }
+}
+
+class Environment{
+  constructor(parent, label){ this.vars=new Map(); this.parent=parent||null; this.label=label||'block'; }
+  declare(name,value){ this.vars.set(name,value); }
+  has(name){ return this.vars.has(name) || (this.parent && this.parent.has(name)); }
+  get(name){ if(this.vars.has(name)) return this.vars.get(name); if(this.parent) return this.parent.get(name); throw new ReferenceError(`'${name}' is not defined`); }
+  set(name,value){ if(this.vars.has(name)){ this.vars.set(name,value); return; } if(this.parent){ this.parent.set(name,value); return; } throw new ReferenceError(`'${name}' is not defined`); }
+  ownerOf(name){ if(this.vars.has(name)) return this; if(this.parent) return this.parent.ownerOf(name); return null; }
+}
+
+class ReturnSignal{ constructor(value){ this.value=value; } }
+class BreakSignal{}
+class ContinueSignal{}
+
+class Interpreter{
+  constructor(src){
+    this.src = src;
+    this.lines = src.split('\n');
+    this.trace = [];
+    this.output = [];
+    this.callStack = [{name:'main()', line:1}];
+    this.stepGuard = 4000;
+    this.stepsUsed = 0;
+  }
+  lineText(line){ return (this.lines[line-1]||'').trim(); }
+
+  run(){
+    const ast = new Parser(tokenize(this.src)).parseProgram();
+    this.globalEnv = new Environment(null,'global');
+    // hoist function declarations
+    ast.body.forEach(node=>{ if(node.type==='FuncDecl') this.globalEnv.declare(node.name, {type:'function', node, closure:this.globalEnv}); });
+    try{
+      this.execBlockBody(ast.body, this.globalEnv);
+    }catch(e){
+      if(!(e instanceof ReturnSignal)) throw e;
+    }
+    return this.trace;
+  }
+
+  guard(){ this.stepsUsed++; if(this.stepsUsed > this.stepGuard) throw new Error('Execution stopped: too many steps (possible infinite loop).'); }
+
+  snapshotVars(env){
+    const seen=new Set(); const rows=[];
+    let e=env;
+    while(e){
+      for(const [k,v] of e.vars.entries()){
+        if(seen.has(k)) continue; seen.add(k);
+        if(v && v.type==='function') continue;
+        rows.push({name:k, value:v, tYpe: Array.isArray(v)?'array':typeof v});
+      }
+      if(e.label==='function') break; // don't leak past function boundary into outer scopes' unrelated vars visually beyond global
+      e=e.parent;
+    }
+    return rows;
+  }
+
+  emit(type, line, env, extra){
+    this.guard();
+    const vars = this.snapshotVars(env);
+    const frame = this.callStack[this.callStack.length-1];
+    if(frame) frame.line = line;
+    this.trace.push({
+      type, line,
+      code: this.lineText(line),
+      vars,
+      callStack: this.callStack.map(f=>({name:f.name, line:f.line})),
+      depth: this.callStack.length,
+      output: this.output.slice(),
+      extra: extra||{}
+    });
+  }
+
+  execBlockBody(body, env){
+    for(const stmt of body) this.execStatement(stmt, env);
+  }
+
+  execStatement(node, env){
+    switch(node.type){
+      case 'VarDeclaration': {
+        for(const d of node.decls){
+          const val = d.init ? this.evalExpr(d.init, env) : undefined;
+          env.declare(d.id, val);
+        }
+        this.emit('declare', node.line, env, {names:node.decls.map(d=>d.id)});
+        return;
+      }
+      case 'ExprStatement': {
+        this.evalExpr(node.expr, env, true);
+        return;
+      }
+      case 'Block': {
+        const inner = new Environment(env,'block');
+        this.execBlockBody(node.body, inner);
+        return;
+      }
+      case 'If': {
+        const result = this.evalExpr(node.test, env);
+        this.emit('condition', node.line, env, {result:!!result, code:this.lineText(node.line)});
+        if(result) this.execStatement(node.cons, env);
+        else if(node.alt) this.execStatement(node.alt, env);
+        return;
+      }
+      case 'For': {
+        const loopEnv = new Environment(env,'block');
+        if(node.init){ if(node.init.type==='VarDeclaration') this.execStatement(node.init, loopEnv); else this.evalExpr(node.init.expr, loopEnv); }
+        while(true){
+          const testVal = node.test ? this.evalExpr(node.test, loopEnv) : true;
+          this.emit('condition', node.line, loopEnv, {result:!!testVal, code:this.lineText(node.line)});
+          if(!testVal) break;
+          const bodyEnv = new Environment(loopEnv,'block');
+          try{ this.execStatement(node.body, bodyEnv); }
+          catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+          if(node.update){ this.evalExpr(node.update, loopEnv); this.emit('increment', node.line, loopEnv, {code:this.exprText(node.update)}); }
+        }
+        return;
+      }
+      case 'While': {
+        while(true){
+          const testVal = this.evalExpr(node.test, env);
+          this.emit('condition', node.line, env, {result:!!testVal, code:this.lineText(node.line)});
+          if(!testVal) break;
+          const bodyEnv = new Environment(env,'block');
+          try{ this.execStatement(node.body, bodyEnv); }
+          catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+        }
+        return;
+      }
+      case 'DoWhile': {
+        while(true){
+          const bodyEnv = new Environment(env,'block');
+          try{ this.execStatement(node.body, bodyEnv); }
+          catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+          const testVal = this.evalExpr(node.test, env);
+          this.emit('condition', node.line, env, {result:!!testVal, code:this.lineText(node.line)});
+          if(!testVal) break;
+        }
+        return;
+      }
+      case 'FuncDecl': {
+        env.declare(node.name, {type:'function', node, closure:env});
+        return;
+      }
+      case 'Return': {
+        const val = node.arg ? this.evalExpr(node.arg, env) : undefined;
+        this.emit('return', node.line, env, {value: val, fn:this.callStack[this.callStack.length-1].name});
+        throw new ReturnSignal(val);
+      }
+      case 'BreakStatement': throw new BreakSignal();
+      case 'ContinueStatement': throw new ContinueSignal();
+      default: throw new Error('Unknown statement: '+node.type);
+    }
+  }
+
+  exprText(node){
+    if(!node) return '';
+    if(node.type==='Update') return (node.prefix? node.op+this.exprText(node.arg) : this.exprText(node.arg)+node.op);
+    if(node.type==='Assign') return this.exprText(node.left)+' '+node.op+' '+this.exprText(node.right);
+    if(node.type==='Ident') return node.name;
+    if(node.type==='Literal') return JSON.stringify(node.value);
+    return '';
+  }
+
+  callFunction(fnVal, args, line, env){
+    const frameName = (fnVal.node.name||'anonymous')+'('+args.map(a=>this.stringify(a)).join(', ')+')';
+    this.callStack.push({name:frameName, line:fnVal.node.line});
+    this.emit('call', line, env, {name:frameName});
+    const fnEnv = new Environment(fnVal.closure,'function');
+    fnVal.node.params.forEach((p,idx)=> fnEnv.declare(p, args[idx]));
+    let ret;
+    try{
+      this.execBlockBody(fnVal.node.body.body, fnEnv);
+      ret = undefined;
+    }catch(e){
+      if(e instanceof ReturnSignal) ret = e.value; else throw e;
+    }
+    this.callStack.pop();
+    return ret;
+  }
+
+  stringify(v){
+    if(Array.isArray(v)) return '['+v.map(x=>this.stringify(x)).join(', ')+']';
+    if(typeof v==='string') return v;
+    if(v===undefined) return 'undefined';
+    if(v===null) return 'null';
+    return String(v);
+  }
+
+  evalExpr(node, env, isStatementLevel){
+    switch(node.type){
+      case 'Literal': return node.value;
+      case 'ArrayLit': return node.elements.map(e=>this.evalExpr(e,env));
+      case 'Ident': return env.get(node.name);
+      case 'Unary': {
+        const v=this.evalExpr(node.arg,env);
+        if(node.op==='!') return !v;
+        if(node.op==='-') return -v;
+        if(node.op==='+') return +v;
+        break;
+      }
+      case 'Update': {
+        const owner = node.arg.type==='Ident' ? env.ownerOf(node.arg.name) : null;
+        let oldVal, newVal, target;
+        if(node.arg.type==='Ident'){
+          oldVal = env.get(node.arg.name);
+          newVal = node.op==='++' ? oldVal+1 : oldVal-1;
+          env.set(node.arg.name, newVal);
+        } else if(node.arg.type==='Member'){
+          const obj=this.evalExpr(node.arg.object,env);
+          const key=node.arg.computed?this.evalExpr(node.arg.property,env):node.arg.property.value;
+          oldVal=obj[key]; newVal= node.op==='++'?oldVal+1:oldVal-1; obj[key]=newVal;
+        }
+        if(!isStatementLevel){
+          // as expression, handled by caller context; emit still useful
+        }
+        this.emit(node.arg.type==='Ident' ? 'increment' : 'assign', node.line, env, {code:this.exprText(node)});
+        return node.prefix ? newVal : oldVal;
+      }
+      case 'Binary': {
+        const l=this.evalExpr(node.left,env), r=this.evalExpr(node.right,env);
+        switch(node.op){
+          case '+': return l+r; case '-': return l-r; case '*': return l*r; case '/': return l/r; case '%': return l%r;
+          case '<': return l<r; case '>': return l>r; case '<=': return l<=r; case '>=': return l>=r;
+          case '==': return l==r; case '!=': return l!=r; case '===': return l===r; case '!==': return l!==r;
+        }
+        break;
+      }
+      case 'Logical': {
+        const l=this.evalExpr(node.left,env);
+        if(node.op==='&&') return l ? this.evalExpr(node.right,env) : l;
+        if(node.op==='||') return l ? l : this.evalExpr(node.right,env);
+        break;
+      }
+      case 'Assign': {
+        let rVal = this.evalExpr(node.right, env);
+        if(node.left.type==='Ident'){
+          if(node.op!=='='){
+            const cur = env.get(node.left.name);
+            rVal = this.applyCompound(node.op, cur, rVal);
+          }
+          env.set(node.left.name, rVal);
+          this.emit('assign', node.line, env, {name:node.left.name, value:rVal, code:this.exprText(node.left)+' '+node.op+' ...'});
+        } else if(node.left.type==='Member'){
+          const obj=this.evalExpr(node.left.object,env);
+          const key=node.left.computed?this.evalExpr(node.left.property,env):node.left.property.value;
+          if(node.op!=='='){ rVal=this.applyCompound(node.op, obj[key], rVal); }
+          obj[key]=rVal;
+          this.emit('assign', node.line, env, {code:'array/element update'});
+        }
+        return rVal;
+      }
+      case 'Member': {
+        const obj=this.evalExpr(node.object,env);
+        const key=node.computed?this.evalExpr(node.property,env):node.property.value;
+        return obj==null?undefined:obj[key];
+      }
+      case 'Call': {
+        if(node.callee.type==='Member' && node.callee.object.type==='Ident' && node.callee.object.name==='console' && node.callee.property.value==='log'){
+          const args = node.args.map(a=>this.evalExpr(a,env));
+          const text = args.map(a=>this.stringify(a)).join(' ');
+          this.output.push(text);
+          this.emit('output', node.line, env, {text});
+          return undefined;
+        }
+        if(node.callee.type==='Ident'){
+          const fnVal = env.get(node.callee.name);
+          if(!fnVal || fnVal.type!=='function') throw new TypeError(`${node.callee.name} is not a function`);
+          const args = node.args.map(a=>this.evalExpr(a,env));
+          return this.callFunction(fnVal, args, node.line, env);
+        }
+        throw new Error('Unsupported call expression');
+      }
+      default: throw new Error('Unknown expression: '+node.type);
+    }
+  }
+  applyCompound(op, cur, r){
+    switch(op){ case '+=': return cur+r; case '-=': return cur-r; case '*=': return cur*r; case '/=': return cur/r; case '%=': return cur%r; }
+  }
+}
+
+/* ================= Explanation templates ================= */
+function explain(step){
+  const c = step.code || '';
+  switch(step.type){
+    case 'declare':
+      return step.extra.names.map(n=>{
+        const row = step.vars.find(v=>v.name===n);
+        const val = row ? formatVal(row.value) : 'undefined';
+        return `Declaring <b>${n}</b> and setting it to <b>${val}</b>.`;
+      }).join('<br>');
+    case 'assign':
+      return `Updating a value: <code style="color:#e8e8f0">${escapeHtml(c)}</code>`;
+    case 'condition':
+      return `Checking condition <code style="color:#e8e8f0">${escapeHtml(step.extra.code||c)}</code> → <b style="color:${step.extra.result?'#3ddc97':'#ef5d7a'}">${step.extra.result?'true':'false'}</b>${step.extra.result?', entering the block.':', skipping / exiting the loop.'}`;
+    case 'increment':
+      return `Incrementing/updating: <code style="color:#e8e8f0">${escapeHtml(step.extra.code||c)}</code>`;
+    case 'call':
+      return `Calling function <b>${step.extra.name}</b> — a new stack frame is pushed.`;
+    case 'return':
+      return `Returning <b>${formatVal(step.extra.value)}</b> from <b>${step.extra.fn}</b> — its stack frame is popped.`;
+    case 'output':
+      return `Printing to console: <b>${escapeHtml(step.extra.text)}</b>`;
+    default:
+      return `Executing: <code>${escapeHtml(c)}</code>`;
+  }
+}
+function formatVal(v){
+  if(Array.isArray(v)) return '['+v.map(formatVal).join(', ')+']';
+  if(typeof v==='string') return '"'+v+'"';
+  if(v===undefined) return 'undefined';
+  return String(v);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+/* ================= UI wiring ================= */
+const EXAMPLES = {
+  sum: `let sum = 0;
+
+for (let i = 1; i <= 3; i++) {
+    sum += i;
+}
+
+console.log(sum);`,
+  fib: `function fib(n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+let result = fib(5);
+console.log(result);`,
+  arr: `let nums = [4, 8, 15, 16, 23];
+let total = 0;
+
+for (let i = 0; i < nums.length; i++) {
+    total += nums[i];
+}
+
+console.log(total);`
+};
+
+let trace = [];
+let cur = 0;
+let playing = false;
+let playTimer = null;
+let ast = null;
+
+const codeInput = document.getElementById('codeInput');
+const codeHighlight = document.getElementById('codeHighlight');
+const gutter = document.getElementById('gutter');
+const errBox = document.getElementById('errBox');
+const statusBar = document.getElementById('statusBar');
+
+function highlightSyntax(code){
+  return escapeHtml(code)
+    .replace(/\b(let|const|var|if|else|for|while|do|function|return|true|false|null|break|continue)\b/g, '<span class="kw">$1</span>')
+    .replace(/\b(console)\b/g, '<span class="fn">$1</span>')
+    .replace(/(&quot;.*?&quot;|'.*?')/g, m=>`<span class="str">${m}</span>`)
+    .replace(/\b(\d+(\.\d+)?)\b/g, '<span class="num">$1</span>')
+    .replace(/(\/\/.*$)/gm, '<span class="com">$1</span>');
+}
+
+function syncEditor(){
+  const code = codeInput.value;
+  codeHighlight.innerHTML = highlightSyntax(code) + '\n';
+  const lines = code.split('\n');
+  gutter.innerHTML = lines.map((_,idx)=>`<div class="ln" data-n="${idx+1}">${idx+1}</div>`).join('');
+  document.getElementById('lineCount').textContent = 'Lines: '+lines.length;
+  document.getElementById('charCount').textContent = 'Characters: '+code.length;
+}
+codeInput.addEventListener('input', syncEditor);
+codeInput.addEventListener('scroll', ()=>{
+  codeHighlight.parentElement.scrollTop = codeInput.scrollTop;
+  gutter.scrollTop = codeInput.scrollTop;
+});
+
+const LINE_H = 22;
+function markExecLine(line){
+  gutter.querySelectorAll('.ln').forEach(el=> el.classList.toggle('exec', Number(el.dataset.n)===line));
+  const bar = document.getElementById('execHl');
+  if(line && line>0){
+    bar.style.display='block';
+    bar.style.top = (14 + (line-1)*LINE_H) + 'px';
+    bar.style.height = LINE_H + 'px';
+    bar.classList.remove('exec-flash'); void bar.offsetWidth; bar.classList.add('exec-flash');
+    const activeLn = gutter.querySelector('.ln.exec');
+    if(activeLn) activeLn.scrollIntoView({block:'nearest'});
+  } else {
+    bar.style.display='none';
+  }
+}
+
+function runCode(){
+  errBox.style.display='none';
+  const src = codeInput.value;
+  try{
+    const interp = new Interpreter(src);
+    trace = interp.run();
+    if(trace.length===0) throw new Error('Nothing to trace — did you write any statements?');
+    cur = 0;
+    statusBar.classList.remove('err');
+    document.getElementById('readyLabel').textContent = 'Ready';
+    document.getElementById('stepCount').textContent = 'Steps: '+trace.length;
+    renderAll();
+  }catch(e){
+    trace = [];
+    errBox.style.display='block';
+    errBox.textContent = (e.name||'Error') + ': ' + e.message;
+    statusBar.classList.add('err');
+    document.getElementById('readyLabel').textContent = 'Error';
+    document.getElementById('consoleBody').innerHTML = `<span class="err">${escapeHtml(e.message)}</span>`;
+    document.getElementById('stepPill').textContent = 'Step 0 of 0';
+    document.getElementById('varsBody').innerHTML = `<tr><td colspan="3" class="var-empty">Fix the error above and run again.</td></tr>`;
+    document.getElementById('aiBody').innerHTML = `<p>Execution stopped with an error. Check the message above the Run buttons.</p>`;
+    document.getElementById('timeline').innerHTML = '';
+    document.getElementById('structBody').innerHTML = '';
+    document.getElementById('stackBody').innerHTML = '';
+    document.getElementById('memBody').innerHTML = '';
+    markExecLine(-1);
+  }
+}
+
+function renderTimeline(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML='';
+  trace.forEach((s,idx)=>{
+    const div=document.createElement('div');
+    div.className='tl-step'+(idx<cur?' done':'')+(idx===cur?' current':'');
+    div.innerHTML=`<div class="tl-num">${idx+1}</div><div class="tl-title">${s.type}</div><div class="tl-sub">line ${s.line}</div>`;
+    div.onclick=()=>{ stopPlay(); goto(idx); };
+    tl.appendChild(div);
+  });
+  const el=tl.children[cur]; if(el) el.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+}
+
+function renderStage(){
+  const s = trace[cur];
+  document.getElementById('stepPill').textContent = `Step ${cur+1} of ${trace.length}`;
+  document.getElementById('execLine').textContent = s.code || '(block)';
+  const wrap = document.getElementById('opRowWrap');
+  const note = document.getElementById('stageNote');
+  note.textContent='';
+  if(s.type==='condition'){
+    wrap.innerHTML = `<div class="op-row">
+      <div class="cond-card ${s.extra.result?'t':'f'}">${s.extra.result?'✓ TRUE':'✕ FALSE'}</div>
+    </div>
+    <div class="stage-note">${escapeHtml(s.extra.code||'')}</div>`;
+  } else if(s.type==='assign' || s.type==='increment' || s.type==='declare'){
+    const changed = s.vars.filter(v=>true).slice(0,4);
+    wrap.innerHTML = `<div class="op-row">` + changed.map(v=>`
+      <div class="opbox-label"><div class="lbl">${v.name}</div><div class="opbox glow-blue">${formatVal(v.value)}</div></div>`).join('') + `</div>`;
+  } else if(s.type==='call'){
+    wrap.innerHTML = `<div class="op-row"><div class="opbox-label"><div class="lbl">call stack ↓</div><div class="opbox glow-blue" style="color:#a98bff;border:2px solid #7c5cff;background:#7c5cff14;">${escapeHtml(s.extra.name)}</div></div></div>`;
+  } else if(s.type==='return'){
+    wrap.innerHTML = `<div class="op-row"><div class="opbox-label"><div class="lbl">return ↑</div><div class="opbox glow-green">${formatVal(s.extra.value)}</div></div></div>`;
+  } else if(s.type==='output'){
+    wrap.innerHTML = `<div class="op-row"><div class="opbox-label"><div class="lbl">console.log</div><div class="opbox glow-blue" style="color:var(--amber);border:2px solid var(--amber);background:#f0b94a14;">${escapeHtml(s.extra.text)}</div></div></div>`;
+  } else {
+    wrap.innerHTML = '';
+  }
+  markExecLine(s.line);
+}
+
+function renderVars(){
+  const body=document.getElementById('varsBody');
+  const s=trace[cur];
+  const prev = cur>0 ? trace[cur-1] : null;
+  if(!s.vars.length){ body.innerHTML = `<tr><td colspan="3" class="var-empty">No variables in scope yet.</td></tr>`; return; }
+  body.innerHTML = s.vars.map((v,idx)=>{
+    const prevRow = prev ? prev.vars.find(p=>p.name===v.name) : null;
+    const changed = !prevRow || JSON.stringify(prevRow.value)!==JSON.stringify(v.value);
+    return `<tr class="${changed?'changed':''}" style="animation-delay:${idx*40}ms"><td>${v.name}</td><td>${formatVal(v.value)}</td><td>${v.tYpe}</td></tr>`;
+  }).join('');
+}
+
+function renderStack(){
+  const s=trace[cur];
+  document.getElementById('stackBody').innerHTML = s.callStack.slice().reverse().map((f,idx)=>`
+    <div class="stack-frame"><div class="fname">${f.name}</div><div class="fline">(line ${f.line})</div></div>`).join('');
+}
+
+function renderMem(){
+  const s=trace[cur];
+  document.getElementById('memBody').innerHTML = s.vars.map(v=>`
+    <div class="mem-row"><span class="k">${v.name}</span><span class="v">${formatVal(v.value)}</span><span class="t">${v.tYpe}</span></div>`).join('') || `<div class="mem-row"><span class="t">empty</span></div>`;
+}
+
+let consoleTypeToken = 0;
+function renderConsole(){
+  const s=trace[cur];
+  const body = document.getElementById('consoleBody');
+  const myToken = ++consoleTypeToken;
+  const priorLines = s.output.slice(0,-1);
+  const lastLine = s.output.length ? s.output[s.output.length-1] : null;
+  body.innerHTML = priorLines.map(l=>`<div class="console-line">${escapeHtml(l)}</div>`).join('');
+  if(lastLine===null) return;
+  const lineEl = document.createElement('div');
+  lineEl.className = 'console-line';
+  const caret = document.createElement('span'); caret.className='caret'; caret.textContent='\u00A0';
+  body.appendChild(lineEl); lineEl.appendChild(caret);
+  let i=0;
+  const speed = Math.max(4, Math.min(18, 260/Math.max(lastLine.length,1)));
+  (function tick(){
+    if(myToken!==consoleTypeToken) return;
+    if(i<=lastLine.length){
+      lineEl.textContent = lastLine.slice(0,i);
+      lineEl.appendChild(caret);
+      i++;
+      setTimeout(tick, speed);
+    } else { caret.remove(); }
+  })();
+}
+
+let aiTypeToken = 0;
+function renderAI(){
+  const target = explain(trace[cur]);
+  const body = document.getElementById('aiBody');
+  const myToken = ++aiTypeToken;
+  // explanations contain simple <b>/<code> tags — reveal by tag-aware chunking so markup never breaks mid-tag
+  const chunks = target.split(/(<[^>]+>)/g).filter(x=>x.length);
+  body.innerHTML = '<p></p>';
+  const p = body.querySelector('p');
+  let ci=0, charIdx=0;
+  (function tick(){
+    if(myToken!==aiTypeToken) return;
+    if(ci>=chunks.length) return;
+    const chunk = chunks[ci];
+    if(chunk.startsWith('<')){ p.innerHTML += chunk; ci++; setTimeout(tick,0); return; }
+    p.innerHTML += chunk[charIdx];
+    charIdx++;
+    if(charIdx>=chunk.length){ ci++; charIdx=0; }
+    setTimeout(tick, 12);
+  })();
+}
+
+function renderStruct(){
+  const s = trace[cur];
+  const lines = codeInput.value.split('\n');
+  const body = document.getElementById('structBody');
+  body.innerHTML = lines.map((l,idx)=>{
+    const n=idx+1; const active = n===s.line;
+    const trimmed = l.trim();
+    if(!trimmed) return '';
+    return `<div class="struct-row${active?' active':''}"><span class="lno">${n}</span>${escapeHtml(trimmed)}</div>`;
+  }).join('');
+  const activeEl = body.querySelector('.active');
+  if(activeEl) activeEl.scrollIntoView({block:'nearest'});
+}
+
+function renderAll(){
+  renderTimeline(); renderStage(); renderVars(); renderStack(); renderMem(); renderConsole(); renderAI(); renderStruct();
+  document.getElementById('tPrev').style.opacity = cur===0?0.4:1;
+  document.getElementById('tNext').style.opacity = cur===trace.length-1?0.4:1;
+}
+
+function goto(idx){
+  if(!trace.length) return;
+  cur = Math.max(0, Math.min(trace.length-1, idx));
+  renderAll();
+}
+
+document.getElementById('tPrev').onclick=()=>{ stopPlay(); goto(cur-1); };
+document.getElementById('tNext').onclick=()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnInto').onclick=()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnOver').onclick=()=>{
+  stopPlay();
+  if(!trace.length) return;
+  const startDepth = trace[cur].depth;
+  let j = cur+1;
+  if(trace[j] && trace[j].type==='call'){
+    while(j<trace.length-1 && trace[j].depth > startDepth) j++;
+  }
+  goto(j);
+};
+document.getElementById('btnReset').onclick=()=>{ stopPlay(); if(trace.length) goto(0); };
+document.getElementById('btnRun').onclick=()=>{ stopPlay(); runCode(); };
+document.getElementById('tPlay').onclick=()=>{ playing?stopPlay():startPlay(); };
+
+function startPlay(){
+  if(!trace.length) return;
+  playing=true; document.getElementById('tPlay').textContent='⏸';
+  playTimer=setInterval(()=>{ if(cur>=trace.length-1){ stopPlay(); return; } goto(cur+1); }, 1100);
+}
+function stopPlay(){ playing=false; document.getElementById('tPlay').textContent='▶'; if(playTimer) clearInterval(playTimer); }
+
+document.getElementById('qaDownload').onclick=()=>{
+  const blob=new Blob([codeInput.value],{type:'text/javascript'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='main.js'; a.click();
+};
+document.getElementById('qaShare').onclick=()=>{
+  navigator.clipboard?.writeText(JSON.stringify(trace,null,2)).catch(()=>{});
+};
+document.getElementById('qaExample2').onclick=()=>{ codeInput.value=EXAMPLES.fib; syncEditor(); runCode(); };
+document.getElementById('btnExamples').onclick=()=>{
+  const keys=Object.keys(EXAMPLES);
+  const currentIdx = Math.max(0, keys.findIndex(k=>EXAMPLES[k]===codeInput.value));
+  const nextKey = keys[(currentIdx+1)%keys.length];
+  codeInput.value = EXAMPLES[nextKey]; syncEditor(); runCode();
+};
+
+/* subtle animated background — slow, non-distracting */
+(function initParticles(){
+  const box = document.getElementById('bgParticles');
+  const n = window.innerWidth < 700 ? 10 : 22;
+  for(let i=0;i<n;i++){
+    const dot = document.createElement('span');
+    dot.style.left = Math.random()*100 + 'vw';
+    dot.style.top = Math.random()*100 + 'vh';
+    dot.style.animationDuration = (18 + Math.random()*22) + 's';
+    dot.style.animationDelay = (Math.random()*20) + 's';
+    dot.style.opacity = (0.15 + Math.random()*0.25).toFixed(2);
+    box.appendChild(dot);
+  }
+})();
+
+/* init */
+codeInput.value = EXAMPLES.sum;
+syncEditor();
+runCode();
+</script>
+</body>
+</html>
