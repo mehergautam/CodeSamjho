@@ -2,7 +2,7 @@
 
 # 🚀 CodeSamjho
 
-### **Paste your code.Understand every step.**
+### **Paste your code. Understand every step.**
 
 An interactive platform that transforms source code into beautiful animations, making programming easier to learn, debug,and understand.
 
