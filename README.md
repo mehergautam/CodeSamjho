@@ -4,7 +4,7 @@
 
 ### **Paste your code.Understand every step.**
 
-An interactive platform that transforms source code into beautiful animations, making programming easier to learn, debug, and understand.
+An interactive platform that transforms source code into beautiful animations, making programming easier to learn, debug,and understand.
 
 ![Status](https://img.shields.io/badge/Status-Under%20Development-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
