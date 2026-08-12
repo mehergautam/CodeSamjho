@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>CodeSutra — Paste your code. Understand every step.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  :root{
+    --bg: #0a0a12;
+    --panel: #12121c;
+    --panel-2: #15151f;
+    --border: #23232f;
+    --border-soft: #1c1c28;
+    --text: #e8e8f0;
+    --text-dim: #8a8a9c;
+    --text-faint: #55556a;
+    --violet: #7c5cff;
+    --violet-soft: #7c5cff33;
+    --pink: #d84fd0;
+    --blue: #4fa3ff;
+    --green: #3ddc97;
+    --amber: #f0b94a;
+    --red: #ef5d7a;
+    --cyan: #4fd8e8;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, #2a1f5a30, transparent 60%),
+      radial-gradient(ellipse 900px 600px at 90% 10%, #1f2f5a2a, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+  }
+  .wrap{max-width:1580px;margin:0 auto;padding:20px 24px 40px;}
+
+  /* header */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border-soft);
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .logo{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--violet),var(--pink));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;box-shadow:0 0 24px #7c5cff55;
+  }
+  .brand h1{font-size:21px;margin:0;font-weight:700;letter-spacing:-0.02em;}
+  .brand h1 span{background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand p{margin:1px 0 0;font-size:12.5px;color:var(--text-dim);}
+  .hdr-actions{display:flex;align-items:center;gap:10px;}
+  .pill{
+    display:flex;align-items:center;gap:6px;
+    background:var(--panel);border:1px solid var(--border);
+    padding:8px 14px;border-radius:9px;font-size:13px;color:var(--text);
+    cursor:pointer;transition:.15s;
+  }
+  .pill:hover{border-color:#3a3a52;background:#171725;}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,#4a3a8a,#7c5cff);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:340px 1fr 300px;gap:18px;align-items:start;}
+  @media (max-width:1200px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:14px;overflow:hidden;
+  }
+  .card + .card{margin-top:18px;}
+  .card-hd{
+    display:flex;align-items:center;justify-content:between;gap:8px;
+    padding:14px 16px;border-bottom:1px solid var(--border-soft);
+    font-size:13.5px;font-weight:600;color:var(--text);
+  }
+  .card-hd .dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 8px var(--green);}
+
+  /* editor */
+  .tabbar{display:flex;align-items:center;gap:2px;padding:10px 10px 0;}
+  .tab{
+    display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;
+    background:#1a1a28;border:1px solid var(--border);border-bottom:none;
+    border-radius:8px 8px 0 0;color:var(--text-dim);
+  }
+  .tab.active{color:var(--text);background:var(--panel-2);}
+  .tab-add{color:var(--text-faint);padding:8px 10px;cursor:pointer;}
+  .editor-tools{display:flex;gap:8px;padding:8px 12px;justify-content:flex-end;color:var(--text-faint);}
+  .editor-tools .ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .editor-tools .ic:hover{background:#1c1c2a;color:var(--text-dim);}
+  .code-area{
+    display:flex;font-family:var(--mono);font-size:13.5px;line-height:24px;
+    background:var(--panel-2);border-top:1px solid var(--border-soft);
+    max-height:420px;overflow:auto;
+  }
+  .gutter{
+    user-select:none;text-align:right;padding:14px 10px 14px 0;color:var(--text-faint);
+    min-width:34px;border-right:1px solid var(--border-soft);
+  }
+  .gutter .ln{padding-right:10px;position:relative;}
+  .gutter .ln.exec::before{
+    content:"▶";position:absolute;left:2px;color:var(--violet);font-size:9px;top:7px;
+  }
+  .code{padding:14px 16px;white-space:pre;outline:none;flex:1;caret-color:var(--violet);}
+  .code .ln{display:block;border-radius:4px;padding:0 4px;margin:0 -4px;}
+  .code .ln.exec{background:#7c5cff22;box-shadow:inset 3px 0 0 var(--violet);}
+  .kw{color:#c792ea;} .type{color:#82aaff;} .str{color:#c3e88d;} .num{color:#f78c6c;}
+  .fn{color:#82aaff;} .com{color:#5c6370;} .plain{color:#e8e8f0;}
+
+  .runbar{display:flex;gap:10px;padding:14px 16px;flex-wrap:wrap;}
+  .btn{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;
+    font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);
+    background:#181826;color:var(--text);transition:.15s;
+  }
+  .btn:hover{background:#1e1e2e;border-color:#33334a;}
+  .btn.primary{background:linear-gradient(90deg,var(--violet),#9a6cff);border:none;color:#fff;box-shadow:0 4px 18px #7c5cff44;}
+  .btn.primary:hover{filter:brightness(1.08);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* timeline */
+  .timeline-track{display:flex;gap:14px;padding:16px;overflow-x:auto;}
+  .tl-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:78px;text-align:center;}
+  .tl-num{
+    width:32px;height:32px;border-radius:50%;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;
+    color:var(--text-dim);background:var(--panel-2);
+  }
+  .tl-step.done .tl-num{border-color:var(--green);color:var(--green);}
+  .tl-step.current .tl-num{border-color:var(--violet);color:#fff;background:var(--violet);box-shadow:0 0 0 4px #7c5cff2a;}
+  .tl-title{font-size:11.5px;color:var(--text);font-weight:600;}
+  .tl-sub{font-size:10.5px;color:var(--text-faint);}
+  .tl-sub.ok{color:var(--green);}
+
+  /* ai explanation */
+  .ai-body{padding:16px;}
+  .ai-body p{margin:0 0 8px;font-size:13.5px;line-height:1.6;color:#c8c8d8;}
+  .ai-body p b{color:var(--text);}
+  .ai-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border-soft);}
+  .eli5{font-size:12.5px;color:var(--violet);cursor:pointer;font-weight:600;}
+  .reacts{display:flex;gap:8px;color:var(--text-faint);}
+  .reacts span{cursor:pointer;}
+
+  /* center visualization */
+  .viz-tabs{display:flex;gap:22px;padding:14px 18px 0;border-bottom:1px solid var(--border-soft);}
+  .viz-tab{padding-bottom:12px;font-size:13.5px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;}
+  .viz-tab.active{color:var(--violet);border-color:var(--violet);}
+  .viz-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;}
+  .step-pill{background:#1a1a2a;border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12.5px;color:var(--text-dim);}
+  .transport{display:flex;align-items:center;gap:10px;}
+  .tbtn{width:34px;height:34px;border-radius:9px;background:#181826;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
+  .tbtn:hover{background:#1e1e2e;}
+  .tbtn.play{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--pink));border:none;box-shadow:0 4px 16px #7c5cff55;}
+  .speed{background:#181826;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text-dim);}
+
+  .stage{
+    margin:0 18px 18px;border:1px solid var(--border-soft);border-radius:12px;
+    background:
+      radial-gradient(circle at 20% 20%, #7c5cff14, transparent 40%),
+      radial-gradient(circle at 80% 70%, #d84fd014, transparent 40%),
+      #0d0d16;
+    padding:22px;min-height:340px;position:relative;overflow:hidden;
+  }
+  .stage-line1{font-family:var(--mono);font-size:13.5px;color:var(--text-dim);margin-bottom:26px;}
+  .stage-line1 b{color:var(--text);font-weight:400;}
+  .stage-line1 .kw{color:#c792ea;} .stage-line1 .fn{color:#82aaff;} .stage-line1 .num{color:#f78c6c;}
+
+  .op-row{display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:44px;}
+  .opbox{width:88px;height:70px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;font-family:var(--mono);}
+  .opbox-label{text-align:center;}
+  .opbox-label .lbl{font-size:12.5px;color:var(--text-dim);margin-bottom:8px;font-weight:600;}
+  .op-sign{font-size:22px;color:var(--text-faint);font-weight:300;}
+  .b-blue{background:#4fa3ff14;border:2px solid #4fa3ff;color:#4fa3ff;}
+  .b-violet{background:#7c5cff14;border:2px solid #7c5cff;color:#a98bff;}
+  .b-green{background:#3ddc9714;border:2px solid #3ddc97;color:#3ddc97;}
+
+  .array-row{display:flex;justify-content:center;gap:26px;}
+  .arr-cell{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .arr-idx{font-size:12px;color:var(--text-faint);}
+  .arr-box{
+    width:66px;height:56px;border-radius:10px;border:2px solid #2c2c3c;background:#171724;
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:19px;font-weight:700;color:var(--text-dim);
+  }
+  .arr-box.hi{border-color:var(--amber);color:var(--amber);background:#f0b94a14;box-shadow:0 0 18px #f0b94a33;}
+  .arr-box.empty{color:var(--text-faint);opacity:.4;}
+  .arr-cursor{color:var(--amber);font-size:16px;margin-top:2px;}
+  .arr-cursor-lbl{font-size:11.5px;color:var(--amber);font-family:var(--mono);}
+
+  /* console */
+  .console-body{padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--green);min-height:28px;}
+
+  /* program flow */
+  .flow-body{padding:22px 18px;overflow-x:auto;}
+  .flow-svg{display:block;margin:0 auto;}
+
+  /* right sidebar */
+  .var-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .var-table th{
+    text-align:left;color:var(--text-faint);font-weight:600;font-size:11.5px;
+    text-transform:uppercase;letter-spacing:.04em;padding:10px 16px 8px;
+  }
+  .var-table td{padding:8px 16px;font-family:var(--mono);border-top:1px solid var(--border-soft);}
+  .var-table tr.changed td:first-child{color:var(--cyan);font-weight:700;}
+  .var-table td:first-child{color:var(--text);font-weight:600;}
+  .var-table td:nth-child(2){color:var(--amber);}
+  .var-table td:nth-child(3){color:var(--text-faint);}
+  .addwatch{display:flex;align-items:center;gap:6px;padding:12px 16px;color:var(--violet);font-size:12.5px;font-weight:600;cursor:pointer;border-top:1px solid var(--border-soft);}
+
+  .stack-frame{
+    margin:14px 16px;padding:12px 14px;border-radius:10px;
+    background:#7c5cff14;border:1px solid #7c5cff55;
+  }
+  .stack-frame .fname{color:#a98bff;font-family:var(--mono);font-weight:700;font-size:13.5px;}
+  .stack-frame .fline{color:var(--text-faint);font-size:11.5px;margin-top:2px;}
+  .stack-tail{width:2px;height:14px;background:#7c5cff55;margin:0 24px;}
+
+  .mem-row{display:flex;justify-content:space-between;padding:9px 16px;font-family:var(--mono);font-size:13px;border-top:1px solid var(--border-soft);}
+  .mem-row .k{color:var(--cyan);font-weight:700;}
+  .mem-row .v{color:var(--amber);}
+  .mem-row .t{color:var(--text-faint);}
+
+  .qa-item{
+    display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:var(--text);
+    cursor:pointer;border-top:1px solid var(--border-soft);
+  }
+  .qa-item:hover{background:#171724;}
+  .qa-item .ic{color:var(--text-dim);font-size:14px;}
+
+  footer.status{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 4px 0;margin-top:6px;color:var(--text-faint);font-size:12px;
+  }
+  footer.status .ready{color:var(--green);display:flex;align-items:center;gap:6px;}
+  footer.status .ready::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+  footer.status .right{display:flex;gap:18px;}
+
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo">⟨/⟩</div>
+      <div>
+        <h1>Code<span>Sutra</span></h1>
+        <p>Paste your code. Understand every step.</p>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <div class="pill">C++ ▾</div>
+      <div class="pill">⚑ Examples</div>
+      <div class="pill">✨ AI Explain</div>
+      <div class="pill">◐ Theme</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- LEFT: Editor -->
+    <div>
+      <div class="card">
+        <div class="tabbar">
+          <div class="tab active">main.cpp ✕</div>
+          <div class="tab-add">＋</div>
+        </div>
+        <div class="editor-tools">
+          <div class="ic" title="Copy">⧉</div>
+          <div class="ic" title="Expand">⤢</div>
+        </div>
+        <div class="code-area">
+          <div class="gutter" id="gutter"></div>
+          <div class="code" id="codeEl" spellcheck="false"></div>
+        </div>
+        <div class="runbar">
+          <div class="btn primary" id="btnRun">▶ Run</div>
+          <div class="btn" id="btnOver">⤵ Step Over</div>
+          <div class="btn" id="btnInto">⤷ Step Into</div>
+          <div class="btn" id="btnReset">↺ Reset</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="dot"></span>Execution Timeline</div>
+        <div class="timeline-track" id="timeline"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">✦ AI Explanation</div>
+        <div class="ai-body" id="aiBody"></div>
+        <div class="ai-foot">
+          <div class="eli5">Explain like I'm 5</div>
+          <div class="reacts"><span>👍</span><span>👎</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Visualization -->
+    <div>
+      <div class="card">
+        <div class="viz-tabs">
+          <div class="viz-tab active" data-tab="viz">Visualization</div>
+          <div class="viz-tab" data-tab="flow">Flowchart</div>
+          <div class="viz-tab" data-tab="graph">Code Graph</div>
+        </div>
+        <div class="viz-topbar">
+          <div class="step-pill" id="stepPill">Step 1 of 11</div>
+          <div class="transport">
+            <div class="tbtn" id="tPrev">⏮</div>
+            <div class="tbtn play" id="tPlay">▶</div>
+            <div class="tbtn" id="tNext">⏭</div>
+            <div class="speed">1x ▾</div>
+          </div>
+        </div>
+
+        <div class="stage" id="stage">
+          <div class="stage-line1">Executing: <span id="execLine"></span></div>
+          <div id="opRowWrap"></div>
+          <div class="array-row" id="arrayRow"></div>
+          <div style="text-align:center;margin-top:6px;">
+            <div class="arr-cursor" id="arrCursor"></div>
+            <div class="arr-cursor-lbl" id="arrCursorLbl"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Console Output</div>
+        <div class="console-body" id="consoleBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Program Flow</div>
+        <div class="flow-body" id="flowBody"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Sidebar -->
+    <div>
+      <div class="card">
+        <div class="card-hd">Variables</div>
+        <table class="var-table">
+          <thead><tr><th>Name</th><th>Value</th><th>Type</th></tr></thead>
+          <tbody id="varsBody"></tbody>
+        </table>
+        <div class="addwatch">＋ Add Watch</div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">☰ Call Stack</div>
+        <div class="stack-frame"><div class="fname">main()</div><div class="fline" id="stackLine">(line 5)</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">▤ Memory (Stack)</div>
+        <div id="memBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Quick Actions</div>
+        <div class="qa-item"><span class="ic">⌗</span>Generate Flowchart</div>
+        <div class="qa-item"><span class="ic">◎</span>Add Breakpoint</div>
+        <div class="qa-item"><span class="ic">⇪</span>Share Visualization</div>
+        <div class="qa-item"><span class="ic">⇩</span>Download Code</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="status">
+    <div class="ready">Ready</div>
+    <div class="right">
+      <span>Lines: 13</span>
+      <span>Characters: 124</span>
+      <span>Mode: Visual</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const sourceLines = [
+  '#include &lt;iostream&gt;',
+  'using namespace std;',
+  '',
+  'int main(){',
+  '&nbsp;&nbsp;&nbsp;&nbsp;int sum = 0;',
+  '',
+  '&nbsp;&nbsp;&nbsp;&nbsp;for(int i = 1; i &lt;= 3; i++){',
+  '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sum += i;',
+  '&nbsp;&nbsp;&nbsp;&nbsp;}',
+  '',
+  '&nbsp;&nbsp;&nbsp;&nbsp;cout &lt;&lt; sum;',
+  '&nbsp;&nbsp;&nbsp;&nbsp;return 0;',
+  '}'
+];
+
+// steps: array index (1-based line highlighted), sum, i, arr values snapshot, cursorIdx, execLabel, explanation, timelineTitle/sub, output
+const steps = [
+  {line:5, sum:0, i:null, arr:[null,null,null,null], cur:-1, exec:'int sum = 0;', out:'',
+    tl:['Initialize','sum = 0'], expl:"We start by declaring <b>sum</b> and setting it to <b>0</b>. This will hold the running total."},
+  {line:7, sum:0, i:1, arr:[null,null,null,null], cur:-1, exec:'i = 1; check i &lt;= 3', out:'',
+    tl:['Initialize','i = 1'], expl:"The loop begins. <b>i</b> is initialized to <b>1</b> before the first pass."},
+  {line:7, sum:0, i:1, arr:[null,null,null,null], cur:-1, exec:'i &lt;= 3', out:'', cond:true,
+    tl:['Check Condition','i &lt;= 3', 'True'], expl:"We check the loop condition: is <b>i (1) &lt;= 3</b>? Yes — the loop body will run."},
+  {line:8, sum:1, i:1, arr:[1,null,null,null], cur:0, exec:'sum += i;', op:{a:0,b:1,r:1}, out:'',
+    tl:['Execute','sum += i','(0 + 1)'], expl:"The current value of <b>i</b> is <b>1</b>.<br>We add <b>i</b> (which is 1) to <b>sum</b> (which is 0).<br>So, <b>sum</b> becomes <b>1</b>."},
+  {line:7, sum:1, i:2, arr:[1,null,null,null], cur:0, exec:'i++;', out:'',
+    tl:['Increment','i++','i = 2'], expl:"<b>i</b> is incremented from <b>1</b> to <b>2</b> before the next condition check."},
+  {line:7, sum:1, i:2, arr:[1,null,null,null], cur:0, exec:'i &lt;= 3', out:'', cond:true,
+    tl:['Check Condition','i &lt;= 3','True'], expl:"We check again: is <b>i (2) &lt;= 3</b>? Yes — another pass through the loop begins."},
+  {line:8, sum:3, i:2, arr:[1,2,null,null], cur:1, exec:'sum += i;', op:{a:1,b:2,r:3}, out:'',
+    tl:['Execute','sum += i','(1 + 2)'], expl:"The current value of <b>i</b> is <b>2</b>.<br>We add <b>i</b> (2) to <b>sum</b> (1).<br>So, <b>sum</b> becomes <b>3</b>."},
+  {line:7, sum:3, i:3, arr:[1,2,null,null], cur:1, exec:'i++;', out:'',
+    tl:['Increment','i++','i = 3'], expl:"<b>i</b> is incremented from <b>2</b> to <b>3</b>."},
+  {line:7, sum:3, i:3, arr:[1,2,null,null], cur:1, exec:'i &lt;= 3', out:'', cond:true,
+    tl:['Check Condition','i &lt;= 3','True'], expl:"We check once more: is <b>i (3) &lt;= 3</b>? Yes — the loop runs a final time."},
+  {line:8, sum:6, i:3, arr:[1,2,3,null], cur:2, exec:'sum += i;', op:{a:3,b:3,r:6}, out:'',
+    tl:['Execute','sum += i','(3 + 3)'], expl:"The current value of <b>i</b> is <b>3</b>.<br>We add <b>i</b> (3) to <b>sum</b> (3).<br>So, <b>sum</b> becomes <b>6</b>."},
+  {line:11, sum:6, i:4, arr:[1,2,3,null], cur:-1, exec:'cout &lt;&lt; sum;', out:'6',
+    tl:['Output','cout &lt;&lt; sum','i = 4, loop ends'], expl:"<b>i</b> is now <b>4</b>, so <b>i &lt;= 3</b> is false and the loop ends.<br>We print <b>sum</b>, which is <b>6</b>, to the console."}
+];
+
+let cur = 0;
+let playing = false;
+let playTimer = null;
+
+function renderCode(){
+  const gutter = document.getElementById('gutter');
+  const codeEl = document.getElementById('codeEl');
+  gutter.innerHTML = '';
+  codeEl.innerHTML = '';
+  const execLine = steps[cur].line;
+  sourceLines.forEach((l,idx)=>{
+    const n = idx+1;
+    const g = document.createElement('div');
+    g.className = 'ln' + (n===execLine?' exec':'');
+    g.textContent = n;
+    gutter.appendChild(g);
+    const c = document.createElement('div');
+    c.className = 'ln' + (n===execLine?' exec':'');
+    c.innerHTML = highlight(l);
+    codeEl.appendChild(c);
+  });
+}
+
+function highlight(l){
+  return l
+    .replace(/(#include|using namespace|int|return|for)/g,'<span class="kw">$1</span>')
+    .replace(/\b(cout|main)\b/g,'<span class="fn">$1</span>')
+    .replace(/\b(\d+)\b/g,'<span class="num">$1</span>');
+}
+
+function renderTimeline(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  steps.forEach((s,idx)=>{
+    const div = document.createElement('div');
+    div.className = 'tl-step' + (idx<cur?' done':'') + (idx===cur?' current':'');
+    div.innerHTML = `<div class="tl-num">${idx+1}</div>
+      <div class="tl-title">${s.tl[0]}</div>
+      <div class="tl-sub${s.tl[2]?' ok':''}">${s.tl[1]}</div>
+      ${s.tl[2] ? `<div class="tl-sub ok">${s.tl[2]}</div>`:''}`;
+    tl.appendChild(div);
+  });
+  // scroll current into view
+  const el = tl.children[cur];
+  if(el) el.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+}
+
+function renderStage(){
+  const s = steps[cur];
+  document.getElementById('execLine').innerHTML = s.exec;
+  document.getElementById('stepPill').textContent = `Step ${cur+1} of ${steps.length}`;
+
+  const opWrap = document.getElementById('opRowWrap');
+  if(s.op){
+    opWrap.innerHTML = `
+      <div class="op-row">
+        <div class="opbox-label"><div class="lbl">sum</div><div class="opbox b-blue">${s.op.a}</div></div>
+        <div class="op-sign">+</div>
+        <div class="opbox-label"><div class="lbl">i</div><div class="opbox b-violet">${s.op.b}</div></div>
+        <div class="op-sign">=</div>
+        <div class="opbox-label"><div class="lbl">sum</div><div class="opbox b-green">${s.op.r}</div></div>
+      </div>`;
+  } else if(s.cond){
+    opWrap.innerHTML = `
+      <div class="op-row">
+        <div class="opbox-label"><div class="lbl">i</div><div class="opbox b-violet">${s.i}</div></div>
+        <div class="op-sign">&le;</div>
+        <div class="opbox-label"><div class="lbl">limit</div><div class="opbox b-blue">3</div></div>
+        <div class="op-sign">=</div>
+        <div class="opbox-label"><div class="lbl">true</div><div class="opbox b-green">✓</div></div>
+      </div>`;
+  } else {
+    opWrap.innerHTML = `
+      <div class="op-row">
+        <div class="opbox-label"><div class="lbl">sum</div><div class="opbox b-blue">${s.sum}</div></div>
+        <div class="op-sign">·</div>
+        <div class="opbox-label"><div class="lbl">i</div><div class="opbox b-violet">${s.i===null?'—':s.i}</div></div>
+      </div>`;
+  }
+
+  const arrRow = document.getElementById('arrayRow');
+  arrRow.innerHTML = '';
+  s.arr.forEach((v,idx)=>{
+    const cell = document.createElement('div');
+    cell.className = 'arr-cell';
+    cell.innerHTML = `<div class="arr-idx">${idx}</div>
+      <div class="arr-box ${idx===s.cur?'hi':(v===null?'empty':'')}">${v===null?'—':v}</div>`;
+    arrRow.appendChild(cell);
+  });
+  document.getElementById('arrCursor').textContent = s.cur>=0 ? '↑' : '';
+  document.getElementById('arrCursorLbl').textContent = s.cur>=0 ? 'i' : '';
+}
+
+function renderVars(){
+  const body = document.getElementById('varsBody');
+  const prev = cur>0 ? steps[cur-1] : {sum:'-',i:'-'};
+  const s = steps[cur];
+  const rows = [
+    {name:'sum', val:s.sum, changed: s.sum!==prev.sum},
+    {name:'i', val: s.i===null?'—':s.i, changed: s.i!==prev.i}
+  ];
+  body.innerHTML = rows.map(r=>`
+    <tr class="${r.changed?'changed':''}">
+      <td>${r.name}</td><td>${r.val}</td><td>int</td>
+    </tr>`).join('');
+}
+
+function renderMem(){
+  const body = document.getElementById('memBody');
+  const s = steps[cur];
+  body.innerHTML = `
+    <div class="mem-row"><span class="k">sum</span><span class="v">${s.sum}</span><span class="t">int</span></div>
+    <div class="mem-row"><span class="k">i</span><span class="v">${s.i===null?'—':s.i}</span><span class="t">int</span></div>`;
+}
+
+function renderConsole(){
+  const body = document.getElementById('consoleBody');
+  const outs = steps.slice(0,cur+1).map(s=>s.out).filter(Boolean);
+  body.textContent = outs.join(' ');
+}
+
+function renderAI(){
+  document.getElementById('aiBody').innerHTML = `<p>${steps[cur].expl}</p>`;
+}
+
+function renderStackLine(){
+  document.getElementById('stackLine').textContent = `(line ${steps[cur].line})`;
+}
+
+function renderFlow(){
+  const active = steps[cur];
+  const isCheck = !!active.cond;
+  const isExec = !!active.op;
+  const isInit = cur===0 || cur===1;
+  const isOut = active.out !== '';
+  const c = (cond)=> cond ? 'fl-active' : '';
+  document.getElementById('flowBody').innerHTML = `
+  <svg class="flow-svg" width="760" height="220" viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5a5a70"/></marker>
+    </defs>
+    <line x1="60" y1="40" x2="130" y2="40" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <ellipse cx="35" cy="40" rx="30" ry="18" fill="${isInit?'#3ddc9722':'#12121c'}" stroke="${isInit?'#3ddc97':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="35" y="44" text-anchor="middle" font-size="11" fill="${isInit?'#3ddc97':'#8a8a9c'}" font-family="Inter">Start</text>
+
+    <rect x="140" y="18" width="110" height="44" rx="9" fill="${isInit?'#7c5cff1f':'#171724'}" stroke="${isInit?'#7c5cff':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="195" y="35" text-anchor="middle" font-size="10.5" fill="${isInit?'#e8e8f0':'#8a8a9c'}" font-family="monospace">sum = 0</text>
+    <text x="195" y="49" text-anchor="middle" font-size="10.5" fill="${isInit?'#e8e8f0':'#8a8a9c'}" font-family="monospace">i = 1</text>
+    <line x1="250" y1="40" x2="300" y2="40" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <polygon points="380,10 450,40 380,70 310,40" fill="${isCheck?'#4fa3ff22':'#12121c'}" stroke="${isCheck?'#4fa3ff':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="380" y="44" text-anchor="middle" font-size="11" fill="${isCheck?'#4fa3ff':'#8a8a9c'}" font-family="monospace">i &lt;= 3 ?</text>
+
+    <line x1="450" y1="40" x2="510" y2="40" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="470" y="30" font-size="10" fill="#3ddc97" font-family="Inter">True</text>
+
+    <rect x="510" y="18" width="100" height="44" rx="9" fill="${isExec?'#f0b94a22':'#171724'}" stroke="${isExec?'#f0b94a':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="560" y="44" text-anchor="middle" font-size="10.5" fill="${isExec?'#f0b94a':'#8a8a9c'}" font-family="monospace">sum += i</text>
+
+    <line x1="610" y1="40" x2="670" y2="40" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="672" y="18" width="70" height="44" rx="9" fill="${(!isCheck&&!isExec&&!isInit&&!isOut)?'#7c5cff22':'#171724'}" stroke="${(!isCheck&&!isExec&&!isInit&&!isOut)?'#7c5cff':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="707" y="44" text-anchor="middle" font-size="10.5" fill="#e8e8f0" font-family="monospace">i++</text>
+
+    <path d="M707,62 L707,120 L380,120 L380,70" fill="none" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <line x1="380" y1="70" x2="380" y2="150" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="392" y="105" font-size="10" fill="#ef5d7a" font-family="Inter">False</text>
+
+    <rect x="300" y="150" width="160" height="42" rx="8" fill="${isOut?'#ef5d7a22':'#171724'}" stroke="${isOut?'#ef5d7a':'#3a2530'}" stroke-width="1.6"/>
+    <text x="380" y="176" text-anchor="middle" font-size="10.5" fill="${isOut?'#ef5d7a':'#8a8a9c'}" font-family="monospace">cout &lt;&lt; sum</text>
+
+    <line x1="460" y1="171" x2="520" y2="171" stroke="#5a5a70" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <ellipse cx="555" cy="171" rx="30" ry="18" fill="${isOut?'#3ddc9722':'#12121c'}" stroke="${isOut?'#3ddc97':'#2a2a3a'}" stroke-width="1.6"/>
+    <text x="555" y="175" text-anchor="middle" font-size="11" fill="${isOut?'#3ddc97':'#8a8a9c'}" font-family="Inter">End</text>
+  </svg>`;
+}
+
+function renderAll(){
+  renderCode();
+  renderTimeline();
+  renderStage();
+  renderVars();
+  renderMem();
+  renderConsole();
+  renderAI();
+  renderStackLine();
+  renderFlow();
+  document.getElementById('tPrev').style.opacity = cur===0?0.4:1;
+  document.getElementById('tNext').style.opacity = cur===steps.length-1?0.4:1;
+}
+
+function goto(idx){
+  cur = Math.max(0, Math.min(steps.length-1, idx));
+  renderAll();
+}
+
+document.getElementById('tPrev').onclick = ()=>{ stopPlay(); goto(cur-1); };
+document.getElementById('tNext').onclick = ()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnOver').onclick = ()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnInto').onclick = ()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnReset').onclick = ()=>{ stopPlay(); goto(0); };
+document.getElementById('btnRun').onclick = ()=>{ stopPlay(); goto(0); startPlay(); };
+
+const playBtn = document.getElementById('tPlay');
+playBtn.onclick = ()=>{ playing ? stopPlay() : startPlay(); };
+
+function startPlay(){
+  playing = true;
+  playBtn.textContent = '⏸';
+  playTimer = setInterval(()=>{
+    if(cur >= steps.length-1){ stopPlay(); return; }
+    goto(cur+1);
+  }, 1200);
+}
+function stopPlay(){
+  playing = false;
+  playBtn.textContent = '▶';
+  if(playTimer) clearInterval(playTimer);
+}
+
+document.querySelectorAll('.viz-tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.viz-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  };
+});
+
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>CodeSutra — See your code think.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  :root{
+    --space:#050509;
+    --panel:rgba(255,255,255,0.035);
+    --panel-solid:#0e0e18;
+    --glass-border:rgba(255,255,255,0.09);
+    --text:#eef0fb; --text-dim:#9294ad; --text-faint:#565a72;
+    --electric:#3d8bff; --purple:#9b6bff; --emerald:#22e8a8; --amber:#f5b84e; --coral:#ff5d7a;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 1000px 600px at 20% -10%, #3d8bff22, transparent 60%),
+      radial-gradient(ellipse 1000px 700px at 85% 0%, #9b6bff1c, transparent 60%),
+      radial-gradient(ellipse 900px 500px at 50% 100%, #22e8a812, transparent 60%),
+      var(--space);
+    color:var(--text); font-family:var(--sans); min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::-webkit-scrollbar{height:8px;width:8px;} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:4px;} ::-webkit-scrollbar-track{background:transparent;}
+
+  .glass{ background:var(--panel); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid var(--glass-border); border-radius:20px; box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 20px 40px -20px rgba(0,0,0,.55); }
+  :focus-visible{ outline:2px solid var(--electric); outline-offset:2px; border-radius:6px; }
+  ::selection{ background:#3d8bff55; color:#fff; }
+  .hero{ box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 60px -24px rgba(0,0,0,.6), 0 0 0 1px rgba(61,139,255,.06); }
+  .bg-particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .bg-particles span{position:absolute;width:3px;height:3px;border-radius:50%;background:#8a9bff;opacity:.3;animation:floatUp linear infinite;}
+  @keyframes floatUp{ 0%{transform:translateY(0);opacity:0;} 10%{opacity:.3;} 90%{opacity:.3;} 100%{transform:translateY(-110vh) translateX(24px);opacity:0;} }
+
+  .wrap{max-width:1520px;margin:0 auto;padding:22px 24px 48px;position:relative;z-index:1;}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;margin-bottom:22px;flex-wrap:wrap;gap:12px;position:relative;}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12) 30%,rgba(255,255,255,.12) 70%,transparent);}
+  .brand{display:flex;align-items:center;gap:13px;}
+  .brand .logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--electric),var(--purple));display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 0 30px #3d8bff55;}
+  .brand h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-0.03em;}
+  .brand h1 span{background:linear-gradient(90deg,var(--electric),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .beta-tag{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--text-faint);background:rgba(255,255,255,.04);border:1px solid var(--glass-border);padding:3px 8px;border-radius:20px;vertical-align:middle;margin-left:4px;-webkit-text-fill-color:var(--text-faint);}
+  .brand p{margin:2px 0 0;font-size:12.5px;color:var(--text-dim);}
+  .hdr-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .pill{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-size:13px;color:var(--text);cursor:pointer;transition:.15s;}
+  .pill:hover{transform:translateY(-1px);background:rgba(255,255,255,0.06);}
+  select.pill{appearance:none;-webkit-appearance:none;padding-right:28px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%239294ad'/></svg>");background-repeat:no-repeat;background-position:right 10px center;border:1px solid var(--glass-border);}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4a3a8a,var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+  .page{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+  @media (max-width:1100px){ .page{grid-template-columns:1fr;} }
+  .main{display:flex;flex-direction:column;gap:22px;}
+
+  /* ---------- Editor card ---------- */
+  .editor-card{overflow:hidden;}
+  .editor-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--glass-border);}
+  .editor-toolbar .fname{font-size:13px;color:var(--text-dim);font-family:var(--mono);}
+  .toolbar-actions{display:flex;gap:8px;}
+  .ic-btn{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);cursor:pointer;transition:.15s;}
+  .ic-btn:hover{background:rgba(255,255,255,.06);color:var(--text-dim);}
+  .editor-wrap{position:relative;}
+  .editor-flex{display:flex;}
+  .gutter{user-select:none;text-align:right;padding:16px 10px 16px 0;color:var(--text-faint);min-width:38px;border-right:1px solid var(--glass-border);font-family:var(--mono);font-size:13.5px;line-height:22px;white-space:pre;}
+  .gutter .ln.exec{color:var(--electric);font-weight:700;}
+  .code-stack{position:relative;flex:1;height:280px;overflow:auto;}
+  pre#codeHighlight{margin:0;padding:16px 18px;font-family:var(--mono);font-size:13.5px;line-height:22px;white-space:pre;pointer-events:none;color:var(--text);min-height:100%;}
+  textarea#codeInput{position:absolute;top:0;left:0;width:100%;height:100%;resize:none;border:none;outline:none;background:transparent;color:transparent;caret-color:#fff;font-family:var(--mono);font-size:13.5px;line-height:22px;padding:16px 18px;white-space:pre;overflow:auto;}
+  .exec-hl{position:absolute;left:0;right:0;background:linear-gradient(90deg,#3d8bff22,transparent 85%);box-shadow:inset 3px 0 0 var(--electric);pointer-events:none;transition:top .18s ease;}
+  @keyframes execGlow{ 0%{box-shadow:inset 3px 0 0 var(--electric),0 0 0 rgba(61,139,255,0);} 40%{box-shadow:inset 3px 0 0 var(--electric),0 0 16px rgba(61,139,255,.4);} 100%{box-shadow:inset 3px 0 0 var(--electric),0 0 0 rgba(61,139,255,0);} }
+  .exec-flash{animation:execGlow .5s ease-out;}
+  .kw{color:#c792ea;} .str{color:#8dd8b0;} .num{color:#f5b84e;} .fn{color:#7cb0ff;} .com{color:#5c6370;}
+  .err-box{margin:0 18px 14px;padding:12px 14px;border-radius:12px;background:#ff5d7a12;border:1px solid #ff5d7a4a;color:#ffc2cd;font-size:12.8px;display:none;line-height:1.6;}
+  .err-box .err-title{font-weight:700;color:#ff8fa3;margin-bottom:4px;font-size:13px;}
+  .err-box .err-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .err-box .err-actions button{font-family:var(--sans);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid #ff5d7a55;background:#ff5d7a1a;color:#ffd7de;cursor:pointer;}
+  .err-box .err-actions button:hover{background:#ff5d7a2c;}
+  .err-box details{margin-top:8px;}
+  .err-box summary{cursor:pointer;color:#ffb3c2;font-size:11.5px;}
+  .err-box pre{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;color:#ffb3c2;margin:6px 0 0;}
+  .runbar{display:flex;gap:10px;padding:14px 18px;flex-wrap:wrap;border-top:1px solid var(--glass-border);}
+  .btn{display:flex;align-items:center;gap:7px;padding:9px 15px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--glass-border);background:rgba(255,255,255,.03);color:var(--text);transition:transform .12s ease,box-shadow .12s ease,background .15s;}
+  .btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(0) scale(.96);}
+  .btn.primary{background:linear-gradient(90deg,var(--electric),var(--purple));border:none;color:#fff;box-shadow:0 4px 20px #3d8bff44;}
+  .btn.primary:hover{box-shadow:0 8px 26px #3d8bff66;}
+
+  /* ---------- Execution Core (hero) ---------- */
+  .hero{padding:22px 22px 6px;position:relative;overflow:hidden;}
+  .hero-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px;}
+  .hero-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .hero-title .tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--electric);background:#3d8bff1a;border:1px solid #3d8bff44;padding:3px 8px;border-radius:20px;text-transform:uppercase;}
+  .step-pill{background:rgba(255,255,255,.05);border:1px solid var(--glass-border);padding:6px 14px;border-radius:20px;font-size:12.5px;color:var(--text-dim);}
+  .transport{display:flex;align-items:center;gap:10px;}
+  .tbtn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);transition:transform .12s ease;}
+  .tbtn:hover{transform:translateY(-2px) scale(1.05);}
+  .tbtn:active{transform:scale(.9);}
+  .tbtn.play{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--electric),var(--purple));border:none;box-shadow:0 4px 20px #3d8bff66;}
+
+  .core-canvas{position:relative;height:400px;margin-top:14px;display:flex;align-items:center;justify-content:center;}
+  .core-canvas svg{position:absolute;inset:0;width:100%;height:100%;}
+  .flow-path{fill:none;stroke-width:2;stroke-dasharray:6 8;animation:flowDash 1.6s linear infinite;opacity:.55;}
+  @keyframes flowDash{ to{ stroke-dashoffset:-140; } }
+  .orb-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .orb{width:130px;height:130px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;transition:box-shadow .4s ease, border-color .4s ease;}
+  .orb-core{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%, #ffffff22, transparent 55%), radial-gradient(circle, var(--orbc,#3d8bff) 0%, #1a1a2e 75%); box-shadow:0 0 60px var(--orbc,#3d8bff88), inset 0 0 30px rgba(255,255,255,.08); transition:background .4s ease, box-shadow .4s ease; animation:orbBreathe 3.2s ease-in-out infinite;}
+  @keyframes orbBreathe{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.045);} }
+  .orb-ring{position:absolute;border-radius:50%;border:1.5px solid var(--orbc,#3d8bff); opacity:.5;}
+  .orb-ring.r1{inset:-14px; animation:ringPulse 2.4s ease-out infinite;}
+  .orb-ring.r2{inset:-30px; animation:ringPulse 2.4s ease-out infinite 1.2s;}
+  @keyframes ringPulse{ 0%{ transform:scale(.85); opacity:.6;} 100%{ transform:scale(1.15); opacity:0;} }
+  .orb-label{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--text);background:rgba(0,0,0,.35);padding:6px 14px;border-radius:20px;border:1px solid var(--glass-border);white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis;}
+  .orb-sub{font-size:11.5px;color:var(--text-dim);text-align:center;max-width:260px;}
+
+  .satellite{position:absolute;width:190px;padding:12px 14px;border-radius:16px;z-index:2;}
+  .satellite h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);display:flex;align-items:center;gap:6px;}
+  .sat-vars{top:6%;left:0%;}
+  .sat-stack{top:6%;right:0%;}
+  .sat-console{bottom:2%;left:50%;transform:translateX(-50%);}
+  .sat-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--text-dim);}
+  .sat-row b{color:var(--text);}
+  .sat-empty{font-size:11.5px;color:var(--text-faint);}
+  @media (max-width:900px){
+    .core-canvas{height:auto;flex-direction:column;gap:16px;padding:10px 0 20px;}
+    .core-canvas svg{display:none;}
+    .satellite{position:static;width:100%;transform:none;}
+  }
+
+  /* ---------- Mentor ---------- */
+  .mentor-card{padding:0;}
+  .mentor-hd{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--glass-border);flex-wrap:wrap;}
+  .mentor-avatar{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--emerald),var(--electric));display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .mentor-levels{display:flex;gap:6px;margin-left:auto;}
+  .mlvl{font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;}
+  .mlvl.active{background:#3d8bff22;border-color:#3d8bff77;color:#bcd6ff;}
+  .mentor-body{padding:16px 18px;font-size:13.5px;line-height:1.7;color:#cfd1e6;min-height:24px;}
+  .mentor-body b{color:var(--text);} .mentor-body code{color:var(--electric);}
+  .caret{display:inline-block;width:7px;background:var(--emerald);animation:caretBlink 1s step-end infinite;}
+  @keyframes caretBlink{50%{opacity:0;}}
+
+  /* ---------- Lower grid ---------- */
+  .lower-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+  @media (max-width:900px){ .lower-grid{grid-template-columns:1fr;} }
+  .lower-card{padding:0;}
+  .lower-hd{padding:14px 16px;font-size:13px;font-weight:700;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:8px;}
+  .lower-hd .dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);}
+
+  .var-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .var-table th{text-align:left;color:var(--text-faint);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:9px 14px 6px;}
+  .var-table td{padding:7px 14px;font-family:var(--mono);border-top:1px solid var(--glass-border);word-break:break-all;}
+  @keyframes rowFlash{0%{background:#3d8bff2e;}100%{background:transparent;}}
+  .var-table tr{transition:background .3s;animation:popRow .3s ease-out;}
+  @keyframes popRow{ 0%{opacity:0;transform:translateY(4px);} 100%{opacity:1;transform:translateY(0);} }
+  .var-table tr.changed{animation:rowFlash 1s ease-out, popRow .3s ease-out;}
+  .var-table tr.changed td:first-child{color:var(--electric);font-weight:700;}
+  .var-table td:first-child{color:var(--text);font-weight:600;}
+  .var-table td:nth-child(2){color:var(--amber);}
+  .var-table td:nth-child(3){color:var(--text-faint);}
+  .var-delta{color:var(--emerald);font-size:10.5px;margin-left:6px;}
+  .var-empty{padding:14px 16px;color:var(--text-faint);font-size:12px;}
+
+  .mem-split{display:grid;grid-template-columns:1fr 1fr;}
+  .mem-col{padding:10px 12px;min-height:120px;}
+  .mem-col + .mem-col{border-left:1px solid var(--glass-border);}
+  .mem-col h5{margin:2px 0 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);}
+  .mem-block{background:rgba(255,255,255,.03);border:1px solid var(--glass-border);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-family:var(--mono);font-size:11.5px;animation:popRow .3s ease-out;}
+  .mem-block .k{color:var(--electric);font-weight:700;} .mem-block .v{color:var(--amber);}
+  .mem-block .addr{color:var(--purple);font-size:10.5px;display:block;margin-top:2px;}
+  .heap-block{border-color:#9b6bff55;background:#9b6bff10;}
+  .mem-empty{font-size:11px;color:var(--text-faint);}
+
+  .stack-frame{margin:0 0 10px;padding:10px 12px;border-radius:11px;background:#3d8bff12;border:1px solid #3d8bff44;animation:stackIn .32s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes stackIn{0%{opacity:0;transform:translateX(-12px) scale(.94);}100%{opacity:1;transform:translateX(0) scale(1);}}
+  .stack-frame .fname{color:#a8c4ff;font-family:var(--mono);font-weight:700;font-size:12.5px;}
+  .stack-frame .fline{color:var(--text-faint);font-size:10.5px;margin-top:2px;}
+  .lower-body-pad{padding:12px 16px;}
+
+  .console-body{padding:12px 16px;font-family:var(--mono);font-size:12.5px;color:var(--emerald);min-height:24px;white-space:pre-wrap;}
+  .console-line{animation:popRow .25s ease-out;}
+  .console-body .err{color:var(--coral);}
+
+  /* ---------- Right rail ---------- */
+  .rail{display:flex;flex-direction:column;gap:18px;position:sticky;top:20px;}
+  .rail-hd{padding:14px 16px;font-size:13px;font-weight:700;border-bottom:1px solid var(--glass-border);}
+  .v-timeline{padding:14px 10px;max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:4px;}
+  .v-step{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:11px;cursor:pointer;opacity:.55;transition:all .2s cubic-bezier(.34,1.56,.64,1);}
+  .v-step .v-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--text-faint);margin-top:3px;flex-shrink:0;transition:all .25s;}
+  .v-step.done{opacity:.85;} .v-step.done .v-dot{border-color:var(--emerald);background:var(--emerald);}
+  .v-step.current{opacity:1;background:rgba(61,139,255,.1);transform:scale(1.03);}
+  .v-step.current .v-dot{border-color:var(--electric);background:var(--electric);box-shadow:0 0 8px var(--electric);}
+  .v-step .v-txt{font-size:11.5px;}
+  .v-step .v-type{font-weight:700;color:var(--text);}
+  .v-icon{display:inline-block;width:16px;text-align:center;margin-right:4px;color:var(--text-faint);font-weight:400;}
+  .v-step.current .v-icon{color:var(--electric);}
+  .breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;font-family:var(--mono);font-size:11.5px;}
+  .breadcrumb .bc-item{padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .breadcrumb .bc-item.bc-current{color:#bcd6ff;background:#3d8bff1c;border-color:#3d8bff55;}
+  .breadcrumb .bc-sep{color:var(--text-faint);}
+  .v-step .v-line{color:var(--text-faint);font-family:var(--mono);}
+
+  .qa-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;cursor:pointer;border-top:1px solid var(--glass-border);transition:background .15s;}
+  .qa-item:hover{background:rgba(255,255,255,.04);}
+  .qa-item:first-child{border-top:none;}
+
+  footer.status{display:flex;align-items:center;justify-content:space-between;padding:16px 4px 0;color:var(--text-faint);font-size:12px;flex-wrap:wrap;gap:8px;}
+  footer.status .ready{color:var(--emerald);display:flex;align-items:center;gap:6px;}
+  footer.status .ready::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 6px var(--emerald);}
+  footer.status.err .ready{color:var(--coral);} footer.status.err .ready::before{background:var(--coral);box-shadow:0 0 6px var(--coral);}
+  footer.status .right{display:flex;gap:18px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div class="bg-particles" id="bgParticles"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">⟨/⟩</div>
+      <div><h1>Code<span>Sutra</span> <span class="beta-tag">JS Engine · v1</span></h1><p>Don't just read code. See how it works.</p></div>
+    </div>
+    <div class="hdr-actions">
+      <select class="pill glass" id="langSelect">
+        <option value="javascript">JavaScript</option>
+        <option value="java" disabled>Java (coming soon)</option>
+        <option value="python" disabled>Python (coming soon)</option>
+        <option value="cpp" disabled>C++ (coming soon)</option>
+      </select>
+      <div class="pill glass" id="btnExamples">⚑ Examples</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="main">
+
+      <!-- EDITOR -->
+      <section class="glass editor-card">
+        <div class="editor-toolbar">
+          <div class="fname" id="fileName">main.js</div>
+          <div class="toolbar-actions">
+            <div class="ic-btn" title="Copy" id="icCopy">⧉</div>
+            <div class="ic-btn" title="Expand">⤢</div>
+          </div>
+        </div>
+        <div class="editor-wrap">
+          <div class="editor-flex">
+            <div class="gutter" id="gutter"></div>
+            <div class="code-stack">
+              <div class="exec-hl" id="execHl" style="display:none;"></div>
+              <pre id="codeHighlight"></pre>
+              <textarea id="codeInput" spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="err-box" id="errBox"></div>
+        <div class="runbar">
+          <div class="btn primary" id="btnRun">▶ Run</div>
+          <div class="btn" id="btnOver">⤵ Step Over</div>
+          <div class="btn" id="btnInto">⤷ Step Into</div>
+          <div class="btn" id="btnOut">↩ Step Out</div>
+          <div class="btn" id="btnReset">↺ Reset</div>
+        </div>
+      </section>
+
+      <!-- EXECUTION CORE (hero) -->
+      <section class="glass hero">
+        <div class="hero-hd">
+          <div class="hero-title">Execution Core <span class="tag">live</span></div>
+          <div class="step-pill" id="stepPill">Step 0 of 0</div>
+          <div class="transport">
+            <div class="tbtn" id="tPrev">⏮</div>
+            <div class="tbtn play" id="tPlay">▶</div>
+            <div class="tbtn" id="tNext">⏭</div>
+          </div>
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="core-canvas" id="coreCanvas">
+          <svg viewBox="0 0 600 400" preserveAspectRatio="none">
+            <path class="flow-path" id="pathVars" d="M300,200 C220,150 150,110 110,80" stroke="#3d8bff"/>
+            <path class="flow-path" id="pathStack" d="M300,200 C380,150 450,110 490,80" stroke="#9b6bff"/>
+            <path class="flow-path" id="pathConsole" d="M300,200 C300,270 300,320 300,360" stroke="#22e8a8"/>
+          </svg>
+
+          <div class="satellite sat-vars glass" id="satVars">
+            <h4>Variables</h4>
+            <div id="satVarsBody"><div class="sat-empty">—</div></div>
+          </div>
+
+          <div class="satellite sat-stack glass" id="satStack">
+            <h4>Call Stack</h4>
+            <div id="satStackBody"><div class="sat-empty">—</div></div>
+          </div>
+
+          <div class="orb-wrap">
+            <div class="orb" id="execOrb"><div class="orb-ring r1"></div><div class="orb-ring r2"></div><div class="orb-core" id="orbCore"></div></div>
+            <div class="orb-label" id="orbLabel">Ready</div>
+            <div class="orb-sub" id="orbSub">Click Run to begin execution</div>
+          </div>
+
+          <div class="satellite sat-console glass" id="satConsole">
+            <h4>Console</h4>
+            <div id="satConsoleBody"><div class="sat-empty">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI MENTOR -->
+      <section class="glass mentor-card">
+        <div class="mentor-hd">
+          <div class="mentor-avatar">✦</div>
+          <div><b>AI Mentor</b><div style="font-size:11px;color:var(--text-faint);">explains the current step from the real trace — never invents values</div></div>
+          <div class="mentor-levels">
+            <div class="mlvl active" data-lvl="beginner">Beginner</div>
+            <div class="mlvl" data-lvl="intermediate">Intermediate</div>
+            <div class="mlvl" data-lvl="advanced">Advanced</div>
+          </div>
+        </div>
+        <div class="mentor-body" id="aiBody">Click <b>Run</b> to execute your code — I'll explain every step as it happens.</div>
+      </section>
+
+      <!-- LOWER GRID -->
+      <div class="lower-grid">
+        <section class="glass lower-card">
+          <div class="lower-hd"><span class="dot"></span>Variables</div>
+          <table class="var-table"><thead><tr><th>Name</th><th>Value</th><th>Type</th></tr></thead><tbody id="varsBody"></tbody></table>
+        </section>
+
+        <section class="glass lower-card">
+          <div class="lower-hd"><span class="dot"></span>Memory — Stack &amp; Heap</div>
+          <div class="mem-split">
+            <div class="mem-col"><h5>Stack (primitives)</h5><div id="memStackBody"></div></div>
+            <div class="mem-col"><h5>Heap (arrays / objects)</h5><div id="memHeapBody"></div></div>
+          </div>
+        </section>
+
+        <section class="glass lower-card">
+          <div class="lower-hd"><span class="dot"></span>Call Stack</div>
+          <div class="lower-body-pad" id="stackBody"></div>
+        </section>
+      </div>
+
+      <section class="glass lower-card">
+        <div class="lower-hd"><span class="dot"></span>Console Output</div>
+        <div class="console-body" id="consoleBody"></div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <aside class="rail">
+      <div class="glass">
+        <div class="rail-hd">Execution Timeline</div>
+        <div class="v-timeline" id="timeline"></div>
+      </div>
+      <div class="glass">
+        <div class="rail-hd">Quick Actions</div>
+        <div class="qa-item" id="qaDownload"><span>⇩</span>Download Code</div>
+        <div class="qa-item" id="qaShare"><span>⇪</span>Copy Trace JSON</div>
+        <div class="qa-item" id="qaExample2"><span>⌗</span>Load Recursion Example</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="status" id="statusBar">
+    <div class="ready" id="readyLabel">Ready</div>
+    <div class="right">
+      <span id="lineCount">Lines: 0</span>
+      <span id="charCount">Characters: 0</span>
+      <span id="stepCount">Steps: 0</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   REAL EXECUTION ENGINE — Lexer -> Parser -> Interpreter
+   (JavaScript only, Phase 1. Same tokenizer/parser/tree-walking
+   interpreter verified against the automated test checklist —
+   see engine test log. No hardcoded/fake traces anywhere below:
+   every trace step comes from actually running this code.)
+   ========================================================= */
+const KEYWORDS = new Set(['let','const','var','if','else','for','while','do','function','return','true','false','null','break','continue']);
+
+function tokenize(src){
+  const tokens = []; let i=0,line=1; const n=src.length;
+  const isDigit=c=>c>='0'&&c<='9'; const isIdentStart=c=>/[A-Za-z_$]/.test(c); const isIdentPart=c=>/[A-Za-z0-9_$]/.test(c);
+  while(i<n){
+    let c=src[i];
+    if(c==='\n'){ line++; i++; continue; }
+    if(c===' '||c==='\t'||c==='\r'){ i++; continue; }
+    if(c==='/'&&src[i+1]==='/'){ while(i<n&&src[i]!=='\n') i++; continue; }
+    if(c==='/'&&src[i+1]==='*'){ i+=2; while(i<n&&!(src[i]==='*'&&src[i+1]==='/')){ if(src[i]==='\n') line++; i++; } i+=2; continue; }
+    if(c==='"'||c==="'"){ const quote=c; let j=i+1,s=''; while(j<n&&src[j]!==quote){ if(src[j]==='\\'){ s+=src[j+1]; j+=2; continue; } s+=src[j]; j++; } tokens.push({type:'str',value:s,line}); i=j+1; continue; }
+    if(isDigit(c)||(c==='.'&&isDigit(src[i+1]))){ let j=i,s=''; while(j<n&&(isDigit(src[j])||src[j]==='.')){ s+=src[j]; j++; } tokens.push({type:'num',value:parseFloat(s),line}); i=j; continue; }
+    if(isIdentStart(c)){ let j=i,s=''; while(j<n&&isIdentPart(src[j])){ s+=src[j]; j++; } tokens.push({type:KEYWORDS.has(s)?'kw':'ident',value:s,line}); i=j; continue; }
+    const three=src.slice(i,i+3), two=src.slice(i,i+2);
+    if(['===','!=='].includes(three)){ tokens.push({type:'op',value:three,line}); i+=3; continue; }
+    if(['==','!=','<=','>=','&&','||','++','--','+=','-=','*=','/=','%=','=>'].includes(two)){ tokens.push({type:'op',value:two,line}); i+=2; continue; }
+    if('+-*/%<>=!'.includes(c)){ tokens.push({type:'op',value:c,line}); i++; continue; }
+    if('(){}[],;.:'.includes(c)){ tokens.push({type:'punc',value:c,line}); i++; continue; }
+    throw new SyntaxError(`Unexpected character '${c}' at line ${line}`);
+  }
+  tokens.push({type:'eof',value:null,line}); return tokens;
+}
+
+class Parser{
+  constructor(tokens){ this.toks=tokens; this.pos=0; }
+  peek(o=0){ return this.toks[this.pos+o]; } next(){ return this.toks[this.pos++]; }
+  at(type,value){ const t=this.peek(); return t.type===type && (value===undefined||t.value===value); }
+  expect(type,value){ if(!this.at(type,value)) throw new SyntaxError(`Expected '${value||type}' but got '${this.peek().value}' at line ${this.peek().line}`); return this.next(); }
+  parseProgram(){ const body=[]; while(!this.at('eof')) body.push(this.parseStatement()); return {type:'Program',body}; }
+  parseStatement(){
+    const t=this.peek();
+    if(t.type==='kw'&&(t.value==='let'||t.value==='const'||t.value==='var')) return this.parseVarDecl(true);
+    if(t.type==='kw'&&t.value==='if') return this.parseIf();
+    if(t.type==='kw'&&t.value==='for') return this.parseFor();
+    if(t.type==='kw'&&t.value==='while') return this.parseWhile();
+    if(t.type==='kw'&&t.value==='do') return this.parseDoWhile();
+    if(t.type==='kw'&&t.value==='function') return this.parseFuncDecl();
+    if(t.type==='kw'&&t.value==='return') return this.parseReturn();
+    if(t.type==='kw'&&t.value==='break'){ this.next(); this.consumeSemi(); return {type:'BreakStatement',line:t.line}; }
+    if(t.type==='kw'&&t.value==='continue'){ this.next(); this.consumeSemi(); return {type:'ContinueStatement',line:t.line}; }
+    if(t.type==='punc'&&t.value==='{') return this.parseBlock();
+    return this.parseExprStatement();
+  }
+  consumeSemi(){ if(this.at('punc',';')) this.next(); }
+  parseParamList(){
+    const params=[];
+    if(!this.at('punc',')')){
+      do{
+        const nameTok=this.expect('ident');
+        let def=null;
+        if(this.at('op','=')){ this.next(); def=this.parseAssign(); }
+        params.push({name:nameTok.value, default:def});
+      } while(this.at('punc',',')&&this.next());
+    }
+    return params;
+  }
+  parseVarDecl(consumeSemiAfter){
+    const kindTok=this.next(); const line=kindTok.line; const decls=[];
+    do{ const idTok=this.expect('ident'); let init=null; if(this.at('op','=')){ this.next(); init=this.parseAssign(); } decls.push({id:idTok.value,init}); } while(this.at('punc',',')&&this.next());
+    if(consumeSemiAfter) this.consumeSemi();
+    return {type:'VarDeclaration',kind:kindTok.value,decls,line};
+  }
+  parseBlock(){ this.expect('punc','{'); const body=[]; while(!this.at('punc','}')) body.push(this.parseStatement()); this.expect('punc','}'); return {type:'Block',body}; }
+  parseIf(){
+    const line=this.next().line; this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')');
+    const cons=this.parseStatement(); let alt=null;
+    if(this.at('kw','else')){ this.next(); alt=this.at('kw','if')?this.parseIf():this.parseStatement(); }
+    return {type:'If',test,cons,alt,line};
+  }
+  parseFor(){
+    const line=this.next().line; this.expect('punc','(');
+    let init=null;
+    if(!this.at('punc',';')){ init=(this.at('kw','let')||this.at('kw','const')||this.at('kw','var'))?this.parseVarDecl(false):{type:'ExprStatement',expr:this.parseExpr(),line:this.peek().line}; }
+    this.expect('punc',';');
+    let test=null; if(!this.at('punc',';')) test=this.parseExpr();
+    this.expect('punc',';');
+    let update=null; if(!this.at('punc',')')) update=this.parseExpr();
+    this.expect('punc',')');
+    const body=this.parseStatement();
+    return {type:'For',init,test,update,body,line};
+  }
+  parseWhile(){ const line=this.next().line; this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')'); const body=this.parseStatement(); return {type:'While',test,body,line}; }
+  parseDoWhile(){ const line=this.next().line; const body=this.parseStatement(); this.expect('kw','while'); this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')'); this.consumeSemi(); return {type:'DoWhile',test,body,line}; }
+  parseFuncDecl(){
+    const line=this.next().line; const name=this.expect('ident').value; this.expect('punc','(');
+    const params=this.parseParamList();
+    this.expect('punc',')'); const body=this.parseBlock();
+    return {type:'FuncDecl',name,params,body,line};
+  }
+  parseReturn(){ const line=this.next().line; let arg=null; if(!this.at('punc',';')&&!this.at('punc','}')) arg=this.parseExpr(); this.consumeSemi(); return {type:'Return',arg,line}; }
+  parseExprStatement(){ const line=this.peek().line; const expr=this.parseExpr(); this.consumeSemi(); return {type:'ExprStatement',expr,line}; }
+  parseExpr(){ return this.parseAssign(); }
+
+  tryParseArrowParams(){
+    const savedPos=this.pos;
+    try{
+      this.expect('punc','(');
+      const params=this.parseParamList();
+      if(!this.at('punc',')')){ this.pos=savedPos; return null; }
+      this.next();
+      if(!this.at('op','=>')){ this.pos=savedPos; return null; }
+      this.next();
+      return params;
+    }catch(e){ this.pos=savedPos; return null; }
+  }
+
+  parseAssign(){
+    // arrow fn: single bare identifier param  ->  x => x*2
+    if(this.at('ident') && this.peek(1) && this.peek(1).type==='op' && this.peek(1).value==='=>'){
+      const nameTok=this.next(); this.next();
+      const body = this.at('punc','{') ? this.parseBlock() : this.parseAssign();
+      return {type:'Arrow', params:[{name:nameTok.value,default:null}], body, isBlock: body.type==='Block', line:nameTok.line};
+    }
+    // arrow fn: parenthesized params  ->  (a,b) => a+b
+    if(this.at('punc','(')){
+      const startLine=this.peek().line;
+      const params=this.tryParseArrowParams();
+      if(params){
+        const body = this.at('punc','{') ? this.parseBlock() : this.parseAssign();
+        return {type:'Arrow', params, body, isBlock: body.type==='Block', line:startLine};
+      }
+    }
+    const left=this.parseLogicalOr();
+    if(this.at('op')&&['=','+=','-=','*=','/=','%='].includes(this.peek().value)){ const op=this.next().value; const right=this.parseAssign(); return {type:'Assign',op,left,right,line:left.line}; }
+    return left;
+  }
+  parseLogicalOr(){ let left=this.parseLogicalAnd(); while(this.at('op','||')){ this.next(); const right=this.parseLogicalAnd(); left={type:'Logical',op:'||',left,right,line:left.line}; } return left; }
+  parseLogicalAnd(){ let left=this.parseEquality(); while(this.at('op','&&')){ this.next(); const right=this.parseEquality(); left={type:'Logical',op:'&&',left,right,line:left.line}; } return left; }
+  parseEquality(){ let left=this.parseRelational(); while(this.at('op')&&['==','!=','===','!=='].includes(this.peek().value)){ const op=this.next().value; const right=this.parseRelational(); left={type:'Binary',op,left,right,line:left.line}; } return left; }
+  parseRelational(){ let left=this.parseAdditive(); while(this.at('op')&&['<','>','<=','>='].includes(this.peek().value)){ const op=this.next().value; const right=this.parseAdditive(); left={type:'Binary',op,left,right,line:left.line}; } return left; }
+  parseAdditive(){ let left=this.parseMultiplicative(); while(this.at('op')&&['+','-'].includes(this.peek().value)){ const op=this.next().value; const right=this.parseMultiplicative(); left={type:'Binary',op,left,right,line:left.line}; } return left; }
+  parseMultiplicative(){ let left=this.parseUnary(); while(this.at('op')&&['*','/','%'].includes(this.peek().value)){ const op=this.next().value; const right=this.parseUnary(); left={type:'Binary',op,left,right,line:left.line}; } return left; }
+  parseUnary(){
+    if(this.at('op')&&['!','-','+'].includes(this.peek().value)){ const op=this.next().value; const arg=this.parseUnary(); return {type:'Unary',op,arg,line:arg.line}; }
+    if(this.at('op','++')||this.at('op','--')){ const op=this.next().value; const arg=this.parseUnary(); return {type:'Update',op,arg,prefix:true,line:arg.line}; }
+    return this.parsePostfix();
+  }
+  parsePostfix(){
+    let node=this.parsePrimary();
+    while(true){
+      if(this.at('punc','.')){ this.next(); const prop=this.expect('ident').value; node={type:'Member',object:node,property:{type:'Literal',value:prop},computed:false,line:node.line}; }
+      else if(this.at('punc','[')){ this.next(); const prop=this.parseExpr(); this.expect('punc',']'); node={type:'Member',object:node,property:prop,computed:true,line:node.line}; }
+      else if(this.at('punc','(')){ this.next(); const args=[]; if(!this.at('punc',')')){ do{ args.push(this.parseAssign()); } while(this.at('punc',',')&&this.next()); } this.expect('punc',')'); node={type:'Call',callee:node,args,line:node.line}; }
+      else if(this.at('op','++')||this.at('op','--')){ const op=this.next().value; node={type:'Update',op,arg:node,prefix:false,line:node.line}; }
+      else break;
+    }
+    return node;
+  }
+  parsePrimary(){
+    const t=this.peek();
+    if(t.type==='num'){ this.next(); return {type:'Literal',value:t.value,line:t.line}; }
+    if(t.type==='str'){ this.next(); return {type:'Literal',value:t.value,line:t.line}; }
+    if(t.type==='kw'&&t.value==='true'){ this.next(); return {type:'Literal',value:true,line:t.line}; }
+    if(t.type==='kw'&&t.value==='false'){ this.next(); return {type:'Literal',value:false,line:t.line}; }
+    if(t.type==='kw'&&t.value==='null'){ this.next(); return {type:'Literal',value:null,line:t.line}; }
+    if(t.type==='ident'){ this.next(); return {type:'Ident',name:t.value,line:t.line}; }
+    if(t.type==='punc'&&t.value==='('){ this.next(); const e=this.parseExpr(); this.expect('punc',')'); return e; }
+    if(t.type==='punc'&&t.value==='['){
+      this.next(); const elements=[];
+      if(!this.at('punc',']')){ do{ elements.push(this.parseAssign()); } while(this.at('punc',',')&&this.next()); }
+      this.expect('punc',']');
+      return {type:'ArrayLit',elements,line:t.line};
+    }
+    if(t.type==='punc'&&t.value==='{'){
+      this.next(); const props=[];
+      if(!this.at('punc','}')){
+        do{
+          let key;
+          if(this.at('str')) key=this.next().value; else key=this.expect('ident').value;
+          this.expect('punc',':');
+          const val=this.parseAssign();
+          props.push({key,value:val});
+        } while(this.at('punc',',')&&this.next());
+      }
+      this.expect('punc','}');
+      return {type:'ObjectLit',props,line:t.line};
+    }
+    throw new SyntaxError(`Unexpected token '${t.value}' at line ${t.line}`);
+  }
+}
+
+class Environment{
+  constructor(parent,label){ this.vars=new Map(); this.parent=parent||null; this.label=label||'block'; }
+  declare(name,value){ this.vars.set(name,value); }
+  has(name){ return this.vars.has(name)||(this.parent&&this.parent.has(name)); }
+  get(name){ if(this.vars.has(name)) return this.vars.get(name); if(this.parent) return this.parent.get(name); throw new ReferenceError(`'${name}' is not defined`); }
+  set(name,value){ if(this.vars.has(name)){ this.vars.set(name,value); return; } if(this.parent){ this.parent.set(name,value); return; } throw new ReferenceError(`'${name}' is not defined`); }
+  ownerOf(name){ if(this.vars.has(name)) return this; if(this.parent) return this.parent.ownerOf(name); return null; }
+}
+class ReturnSignal{ constructor(value){ this.value=value; } }
+class BreakSignal{} class ContinueSignal{}
+
+class Interpreter{
+  constructor(src){
+    this.src=src; this.lines=src.split('\n'); this.trace=[]; this.output=[];
+    this.callStack=[{name:'main()',line:1}]; this.stepGuard=8000; this.stepsUsed=0;
+    this.heapAddr=new WeakMap(); this.heapCounter=0x1000;
+  }
+  lineText(line){ return (this.lines[line-1]||'').trim(); }
+  addressFor(v){ if(!this.heapAddr.has(v)){ this.heapAddr.set(v,'0x'+this.heapCounter.toString(16).toUpperCase()); this.heapCounter+=8; } return this.heapAddr.get(v); }
+  run(){
+    const ast=new Parser(tokenize(this.src)).parseProgram();
+    this.globalEnv=new Environment(null,'global');
+    this.globalEnv.declare('Math', Math);
+    ast.body.forEach(node=>{ if(node.type==='FuncDecl') this.globalEnv.declare(node.name,{type:'function',node,closure:this.globalEnv}); });
+    try{ this.execBlockBody(ast.body,this.globalEnv); }catch(e){ if(!(e instanceof ReturnSignal)) throw e; }
+    return this.trace;
+  }
+  guard(){ this.stepsUsed++; if(this.stepsUsed>this.stepGuard) throw new Error('Execution stopped: too many steps (possible infinite loop).'); }
+  isHeap(v){ return v!==null && typeof v==='object'; }
+  snapshotVars(env){
+    const seen=new Set(); const rows=[]; let e=env;
+    while(e){
+      for(const [k,v] of e.vars.entries()){
+        if(seen.has(k)) continue; seen.add(k);
+        if(v&&v.type==='function') continue;
+        if(k==='Math') continue;
+        const isRef=this.isHeap(v);
+        rows.push({name:k,value:v,tYpe:Array.isArray(v)?'array':(isRef?'object':typeof v),isRef,addr:isRef?this.addressFor(v):null});
+      }
+      if(e.label==='function') break;
+      e=e.parent;
+    }
+    return rows;
+  }
+  emit(type,line,env,extra){
+    this.guard();
+    const vars=this.snapshotVars(env);
+    const frame=this.callStack[this.callStack.length-1];
+    if(frame) frame.line=line;
+    this.trace.push({ type,line,code:this.lineText(line),vars,callStack:this.callStack.map(f=>({name:f.name,line:f.line})),depth:this.callStack.length,output:this.output.slice(),extra:extra||{} });
+  }
+  execBlockBody(body,env){ for(const stmt of body) this.execStatement(stmt,env); }
+  execStatement(node,env){
+    switch(node.type){
+      case 'VarDeclaration': {
+        for(const d of node.decls){ const val=d.init?this.evalExpr(d.init,env):undefined; env.declare(d.id,val); }
+        this.emit('declare',node.line,env,{names:node.decls.map(d=>d.id)}); return;
+      }
+      case 'ExprStatement': { this.evalExpr(node.expr,env,true); return; }
+      case 'Block': { const inner=new Environment(env,'block'); this.execBlockBody(node.body,inner); return; }
+      case 'If': {
+        const result=this.evalExpr(node.test,env);
+        this.emit('condition',node.line,env,{result:!!result,code:this.lineText(node.line)});
+        if(result) this.execStatement(node.cons,env); else if(node.alt) this.execStatement(node.alt,env);
+        return;
+      }
+      case 'For': {
+        const loopEnv=new Environment(env,'block');
+        if(node.init){ if(node.init.type==='VarDeclaration') this.execStatement(node.init,loopEnv); else this.evalExpr(node.init.expr,loopEnv); }
+        while(true){
+          const testVal=node.test?this.evalExpr(node.test,loopEnv):true;
+          this.emit('condition',node.line,loopEnv,{result:!!testVal,code:this.lineText(node.line)});
+          if(!testVal) break;
+          const bodyEnv=new Environment(loopEnv,'block');
+          try{ this.execStatement(node.body,bodyEnv); }catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+          if(node.update){ this.evalExpr(node.update,loopEnv); this.emit('increment',node.line,loopEnv,{code:this.exprText(node.update)}); }
+        }
+        return;
+      }
+      case 'While': {
+        while(true){
+          const testVal=this.evalExpr(node.test,env);
+          this.emit('condition',node.line,env,{result:!!testVal,code:this.lineText(node.line)});
+          if(!testVal) break;
+          const bodyEnv=new Environment(env,'block');
+          try{ this.execStatement(node.body,bodyEnv); }catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+        }
+        return;
+      }
+      case 'DoWhile': {
+        while(true){
+          const bodyEnv=new Environment(env,'block');
+          try{ this.execStatement(node.body,bodyEnv); }catch(e){ if(e instanceof BreakSignal) break; if(!(e instanceof ContinueSignal)) throw e; }
+          const testVal=this.evalExpr(node.test,env);
+          this.emit('condition',node.line,env,{result:!!testVal,code:this.lineText(node.line)});
+          if(!testVal) break;
+        }
+        return;
+      }
+      case 'FuncDecl': { env.declare(node.name,{type:'function',node,closure:env}); return; }
+      case 'Return': {
+        const val=node.arg?this.evalExpr(node.arg,env):undefined;
+        this.emit('return',node.line,env,{value:val,fn:this.callStack[this.callStack.length-1].name});
+        throw new ReturnSignal(val);
+      }
+      case 'BreakStatement': throw new BreakSignal();
+      case 'ContinueStatement': throw new ContinueSignal();
+      default: throw new Error('Unknown statement: '+node.type);
+    }
+  }
+  exprText(node){
+    if(!node) return '';
+    if(node.type==='Update') return node.prefix?node.op+this.exprText(node.arg):this.exprText(node.arg)+node.op;
+    if(node.type==='Assign') return this.exprText(node.left)+' '+node.op+' '+this.exprText(node.right);
+    if(node.type==='Ident') return node.name;
+    if(node.type==='Literal') return JSON.stringify(node.value);
+    return '';
+  }
+  bindParams(params, args, fnEnv){
+    params.forEach((p,idx)=>{
+      let val=args[idx];
+      if(val===undefined && p.default) val=this.evalExpr(p.default, fnEnv);
+      fnEnv.declare(p.name, val);
+    });
+  }
+  callFunction(fnVal,args,line,env){
+    if(this.callStack.length>800) throw new Error('Stack overflow: recursion too deep.');
+    const frameName=(fnVal.node.name||'anonymous')+'('+args.map(a=>this.stringify(a)).join(', ')+')';
+    this.callStack.push({name:frameName,line:fnVal.node.line});
+    this.emit('call',line,env,{name:frameName});
+    const fnEnv=new Environment(fnVal.closure,'function');
+    this.bindParams(fnVal.node.params, args, fnEnv);
+    let ret;
+    try{ this.execBlockBody(fnVal.node.body.body,fnEnv); ret=undefined; }
+    catch(e){ if(e instanceof ReturnSignal) ret=e.value; else throw e; }
+    this.callStack.pop();
+    return ret;
+  }
+  stringify(v){
+    if(Array.isArray(v)) return '['+v.map(x=>this.stringify(x)).join(', ')+']';
+    if(v&&typeof v==='object'){ try{ return JSON.stringify(v); }catch(e){ return '[object]'; } }
+    if(typeof v==='string') return v; if(v===undefined) return 'undefined'; if(v===null) return 'null'; return String(v);
+  }
+  evalExpr(node,env,isStatementLevel){
+    switch(node.type){
+      case 'Literal': return node.value;
+      case 'ArrayLit': return node.elements.map(e=>this.evalExpr(e,env));
+      case 'ObjectLit': { const obj={}; node.props.forEach(p=>{ obj[p.key]=this.evalExpr(p.value,env); }); return obj; }
+      case 'Arrow': {
+        const body = node.isBlock ? node.body : {type:'Block', body:[{type:'Return',arg:node.body,line:node.line}]};
+        return {type:'function', node:{name:null, params:node.params, body, line:node.line}, closure:env};
+      }
+      case 'Ident': return env.get(node.name);
+      case 'Unary': { const v=this.evalExpr(node.arg,env); if(node.op==='!') return !v; if(node.op==='-') return -v; if(node.op==='+') return +v; break; }
+      case 'Update': {
+        let oldVal,newVal;
+        if(node.arg.type==='Ident'){ oldVal=env.get(node.arg.name); newVal=node.op==='++'?oldVal+1:oldVal-1; env.set(node.arg.name,newVal); }
+        else if(node.arg.type==='Member'){ const obj=this.evalExpr(node.arg.object,env); const key=node.arg.computed?this.evalExpr(node.arg.property,env):node.arg.property.value; oldVal=obj[key]; newVal=node.op==='++'?oldVal+1:oldVal-1; obj[key]=newVal; }
+        this.emit(node.arg.type==='Ident'?'increment':'assign',node.line,env,{code:this.exprText(node)});
+        return node.prefix?newVal:oldVal;
+      }
+      case 'Binary': {
+        const l=this.evalExpr(node.left,env), r=this.evalExpr(node.right,env);
+        switch(node.op){ case '+':return l+r; case '-':return l-r; case '*':return l*r; case '/':return l/r; case '%':return l%r;
+          case '<':return l<r; case '>':return l>r; case '<=':return l<=r; case '>=':return l>=r;
+          case '==':return l==r; case '!=':return l!=r; case '===':return l===r; case '!==':return l!==r; }
+        break;
+      }
+      case 'Logical': { const l=this.evalExpr(node.left,env); if(node.op==='&&') return l?this.evalExpr(node.right,env):l; if(node.op==='||') return l?l:this.evalExpr(node.right,env); break; }
+      case 'Assign': {
+        if(node.left.type==='ArrayLit'){
+          const rVal=this.evalExpr(node.right,env);
+          if(!Array.isArray(rVal)) throw new TypeError('Right-hand side of array destructuring must be an array');
+          node.left.elements.forEach((el,idx)=>{
+            const val=rVal[idx];
+            if(el.type==='Ident') env.set(el.name,val);
+            else if(el.type==='Member'){ const obj=this.evalExpr(el.object,env); const key=el.computed?this.evalExpr(el.property,env):el.property.value; obj[key]=val; }
+          });
+          this.emit('assign',node.line,env,{code:'destructuring assignment'});
+          return rVal;
+        }
+        let rVal=this.evalExpr(node.right,env);
+        if(node.left.type==='Ident'){
+          if(node.op!=='='){ const cur=env.get(node.left.name); rVal=this.applyCompound(node.op,cur,rVal); }
+          env.set(node.left.name,rVal);
+          this.emit('assign',node.line,env,{name:node.left.name,value:rVal,code:this.exprText(node.left)+' '+node.op+' ...'});
+        } else if(node.left.type==='Member'){
+          const obj=this.evalExpr(node.left.object,env); const key=node.left.computed?this.evalExpr(node.left.property,env):node.left.property.value;
+          if(node.op!=='='){ rVal=this.applyCompound(node.op,obj[key],rVal); }
+          obj[key]=rVal;
+          this.emit('assign',node.line,env,{code:'element/property update'});
+        }
+        return rVal;
+      }
+      case 'Member': { const obj=this.evalExpr(node.object,env); const key=node.computed?this.evalExpr(node.property,env):node.property.value; return obj==null?undefined:obj[key]; }
+      case 'Call': {
+        if(node.callee.type==='Member'&&node.callee.object.type==='Ident'&&node.callee.object.name==='console'&&node.callee.property.value==='log'){
+          const args=node.args.map(a=>this.evalExpr(a,env)); const text=args.map(a=>this.stringify(a)).join(' ');
+          this.output.push(text); this.emit('output',node.line,env,{text}); return undefined;
+        }
+        if(node.callee.type==='Member'){
+          const obj=this.evalExpr(node.callee.object,env);
+          const key=node.callee.computed?this.evalExpr(node.callee.property,env):node.callee.property.value;
+          const fn=obj==null?undefined:obj[key];
+          const args=node.args.map(a=>this.evalExpr(a,env));
+          if(typeof fn==='function'){
+            this.emit('call',node.line,env,{name:key+'(...)',native:true});
+            return fn.apply(obj,args);
+          }
+          if(fn&&fn.type==='function') return this.callFunction(fn,args,node.line,env);
+          throw new TypeError(`${key} is not a function`);
+        }
+        if(node.callee.type==='Ident'){
+          const fnVal=env.get(node.callee.name);
+          const args=node.args.map(a=>this.evalExpr(a,env));
+          if(fnVal&&fnVal.type==='function') return this.callFunction(fnVal,args,node.line,env);
+          if(typeof fnVal==='function') return fnVal.apply(null,args);
+          throw new TypeError(`${node.callee.name} is not a function`);
+        }
+        const calleeVal=this.evalExpr(node.callee,env);
+        const args=node.args.map(a=>this.evalExpr(a,env));
+        if(calleeVal&&calleeVal.type==='function') return this.callFunction(calleeVal,args,node.line,env);
+        if(typeof calleeVal==='function') return calleeVal.apply(null,args);
+        throw new Error('Value is not callable');
+      }
+      default: throw new Error('Unknown expression: '+node.type);
+    }
+  }
+  applyCompound(op,cur,r){ switch(op){ case '+=':return cur+r; case '-=':return cur-r; case '*=':return cur*r; case '/=':return cur/r; case '%=':return cur%r; } }
+}
+
+/* ================= Language mismatch detector (heuristic, honest) =================
+   This is NOT a real Java/Python/C++ parser. It only pattern-matches a few
+   unmistakable markers so we can show a helpful message instead of a raw
+   "Unexpected token" error when someone pastes non-JS code. */
+function detectLikelyLanguage(src){
+  const s = src;
+  if(/\bpublic\s+(static\s+)?class\b/.test(s) || /\bSystem\.out\.println\b/.test(s) || /\bpublic\s+static\s+void\s+main\b/.test(s)) return 'Java';
+  if(/^\s*def\s+\w+\s*\(.*\)\s*:/m.test(s) || /\bprint\(.*\)\s*$/m.test(s) && /:\s*$/m.test(s) || /\belif\b/.test(s)) return 'Python';
+  if(/#include\s*<.*>/.test(s) || /\bstd::/.test(s) || /\bcout\s*<</.test(s) || /\bint\s+main\s*\(\s*\)/.test(s)) return 'C++';
+  return null;
+}
+
+/* ================= Explanation templates (levels: beginner/intermediate/advanced) ================= */
+function explain(step, level){
+  level = level || 'beginner';
+  const c=step.code||'';
+  const base = (() => { switch(step.type){
+    case 'declare': return step.extra.names.map(n=>{ const row=step.vars.find(v=>v.name===n); const val=row?formatVal(row.value):'undefined'; return `Declaring <b>${n}</b> and setting it to <b>${val}</b>.`; }).join('<br>');
+    case 'assign': return `Updating a value: <code>${escapeHtml(c)}</code>`;
+    case 'condition': return `Checking condition <code>${escapeHtml(step.extra.code||c)}</code> → <b style="color:${step.extra.result?'#22e8a8':'#ff5d7a'}">${step.extra.result?'true':'false'}</b>${step.extra.result?', entering the block.':', skipping / exiting the loop.'}`;
+    case 'increment': return `Incrementing/updating: <code>${escapeHtml(step.extra.code||c)}</code>`;
+    case 'call': return `Calling function <b>${step.extra.name}</b> — a new stack frame is pushed.`;
+    case 'return': return `Returning <b>${formatVal(step.extra.value)}</b> from <b>${step.extra.fn}</b> — its stack frame is popped.`;
+    case 'output': return `Printing to console: <b>${escapeHtml(step.extra.text)}</b>`;
+    default: return `Executing: <code>${escapeHtml(c)}</code>`;
+  } })();
+  if(level==='beginner') return base;
+  if(level==='intermediate') return base + `<br><span style="color:#9294ad;font-size:12px;">Call depth: ${step.depth} · line ${step.line}</span>`;
+  return base + `<br><span style="color:#9294ad;font-size:12px;">Event: <code>${step.type}</code> · depth ${step.depth} · line ${step.line} · vars in scope: ${step.vars.map(v=>v.name).join(', ')||'none'}</span>`;
+}
+function formatVal(v){ if(Array.isArray(v)) return '['+v.map(formatVal).join(', ')+']'; if(v&&typeof v==='object') return '{'+Object.keys(v).map(k=>k+': '+formatVal(v[k])).join(', ')+'}'; if(typeof v==='string') return '"'+v+'"'; if(v===undefined) return 'undefined'; return String(v); }
+function escapeHtml(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+/* ================= UI wiring ================= */
+const EXAMPLES = {
+  sum: `let sum = 0;
+
+for (let i = 1; i <= 3; i++) {
+    sum += i;
+}
+
+console.log(sum);`,
+  fib: `function fib(n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+let result = fib(5);
+console.log(result);`,
+  arr: `let nums = [4, 8, 15, 16, 23];
+let total = 0;
+
+for (let i = 0; i < nums.length; i++) {
+    total += nums[i];
+}
+
+console.log(total);`,
+  quicksort: `function quickSort(arr, low = 0, high = arr.length - 1) {
+    if (low >= high) {
+        return;
+    }
+    const pivotIndex = partition(arr, low, high);
+    quickSort(arr, low, pivotIndex - 1);
+    quickSort(arr, pivotIndex + 1, high);
+}
+
+function partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+
+    for (let j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    return i + 1;
+}
+
+let numbers = [42, 17, 8, 99, 23, 4, 12];
+console.log("Before:", numbers);
+quickSort(numbers);
+console.log("After:", numbers);`
+};
+
+let trace=[], cur=0, playing=false, playTimer=null, mentorLevel='beginner';
+const codeInput=document.getElementById('codeInput');
+const codeHighlight=document.getElementById('codeHighlight');
+const gutter=document.getElementById('gutter');
+const errBox=document.getElementById('errBox');
+const statusBar=document.getElementById('statusBar');
+const LINE_H=22;
+
+function highlightSyntax(code){
+  return escapeHtml(code)
+    .replace(/\b(let|const|var|if|else|for|while|do|function|return|true|false|null|break|continue)\b/g,'<span class="kw">$1</span>')
+    .replace(/\b(console)\b/g,'<span class="fn">$1</span>')
+    .replace(/(&quot;.*?&quot;|'.*?')/g,m=>`<span class="str">${m}</span>`)
+    .replace(/\b(\d+(\.\d+)?)\b/g,'<span class="num">$1</span>')
+    .replace(/(\/\/.*$)/gm,'<span class="com">$1</span>');
+}
+function syncEditor(){
+  const code=codeInput.value;
+  codeHighlight.innerHTML=highlightSyntax(code)+'\n';
+  const lines=code.split('\n');
+  gutter.innerHTML=lines.map((_,idx)=>`<div class="ln" data-n="${idx+1}">${idx+1}</div>`).join('');
+  document.getElementById('lineCount').textContent='Lines: '+lines.length;
+  document.getElementById('charCount').textContent='Characters: '+code.length;
+}
+codeInput.addEventListener('input',syncEditor);
+codeInput.addEventListener('scroll',()=>{ codeHighlight.parentElement.scrollTop=codeInput.scrollTop; gutter.scrollTop=codeInput.scrollTop; });
+
+function markExecLine(line){
+  gutter.querySelectorAll('.ln').forEach(el=>el.classList.toggle('exec',Number(el.dataset.n)===line));
+  const bar=document.getElementById('execHl');
+  if(line&&line>0){
+    bar.style.display='block'; bar.style.top=(16+(line-1)*LINE_H)+'px'; bar.style.height=LINE_H+'px';
+    bar.classList.remove('exec-flash'); void bar.offsetWidth; bar.classList.add('exec-flash');
+    scrollLineIntoViewContained(line);
+  } else bar.style.display='none';
+}
+/* Keeps the executing line visible WITHOUT ever touching the page/window scroll —
+   only the editor's own internal scroll box moves (the textarea is the real
+   scroll master; the highlighted <pre> and gutter just follow it). */
+function scrollLineIntoViewContained(line){
+  const ta = codeInput;
+  const lineTop = 16 + (line-1)*LINE_H;
+  const lineBottom = lineTop + LINE_H;
+  const viewTop = ta.scrollTop;
+  const viewBottom = viewTop + ta.clientHeight;
+  let newTop = null;
+  if(lineTop < viewTop) newTop = lineTop - 12;
+  else if(lineBottom > viewBottom) newTop = lineBottom - ta.clientHeight + 12;
+  if(newTop !== null){
+    ta.scrollTop = Math.max(0,newTop);
+    codeHighlight.parentElement.scrollTop = ta.scrollTop;
+    gutter.scrollTop = ta.scrollTop;
+  }
+}
+
+const ORB_COLORS = { declare:'#3d8bff', assign:'#3d8bff', increment:'#3d8bff', condition:'#f5b84e', call:'#9b6bff', return:'#22e8a8', output:'#22e8a8' };
+const ORB_ICON_LABEL = { declare:'Declaring', assign:'Assigning', increment:'Updating', condition:'Checking', call:'Calling', return:'Returning', output:'Printing' };
+
+function showLanguageMismatch(guess){
+  errBox.style.display='block';
+  errBox.innerHTML = `
+    <div class="err-title">❌ CodeSutra couldn't run this as JavaScript</div>
+    This looks like <b>${guess}</b> code, but <b>JavaScript</b> is selected. CodeSutra only has a real JavaScript execution engine right now — ${guess} support isn't built yet, so trying to run it would either crash or (worse) silently show you wrong steps.
+    <div class="err-actions">
+      <button id="errKeepJs">Keep JavaScript — let me fix my code</button>
+    </div>`;
+  document.getElementById('errKeepJs').onclick = ()=>{ errBox.style.display='none'; };
+}
+
+function showParseError(e, src){
+  errBox.style.display='block';
+  errBox.innerHTML = `
+    <div class="err-title">❌ CodeSutra couldn't parse this code</div>
+    ${escapeHtml(e.message)}
+    <details><summary>Technical details</summary><pre>${escapeHtml(e.stack||e.message)}</pre></details>`;
+}
+
+function runCode(){
+  errBox.style.display='none';
+  const src=codeInput.value;
+
+  if(!src.trim()){
+    errBox.style.display='block';
+    errBox.innerHTML = `<div class="err-title">Nothing to run</div>The editor is empty — paste or write some JavaScript first.`;
+    resetPanelsToEmpty();
+    return;
+  }
+
+  const guess = detectLikelyLanguage(src);
+  if(guess){ showLanguageMismatch(guess); resetPanelsToEmpty(); return; }
+
+  try{
+    const interp=new Interpreter(src);
+    trace=interp.run();
+    if(trace.length===0) throw new Error('Nothing to trace — did you write any executable statements?');
+    cur=0; statusBar.classList.remove('err');
+    document.getElementById('readyLabel').textContent='Ready';
+    document.getElementById('stepCount').textContent='Steps: '+trace.length;
+    renderAll();
+  }catch(e){
+    trace=[];
+    if(e instanceof SyntaxError) showParseError(e, src);
+    else { errBox.style.display='block'; errBox.innerHTML = `<div class="err-title">❌ Runtime error while executing</div>${escapeHtml(e.message)}`; }
+    statusBar.classList.add('err'); document.getElementById('readyLabel').textContent='Error';
+    document.getElementById('consoleBody').innerHTML=`<span class="err">${escapeHtml(e.message)}</span>`;
+    resetPanelsToEmpty();
+  }
+}
+
+function resetPanelsToEmpty(){
+  document.getElementById('stepPill').textContent='Step 0 of 0';
+  document.getElementById('varsBody').innerHTML=`<tr><td colspan="3" class="var-empty">Fix the issue above and run again.</td></tr>`;
+  document.getElementById('aiBody').innerHTML=`Execution stopped. Check the message above the Run buttons.`;
+  document.getElementById('timeline').innerHTML=''; document.getElementById('stackBody').innerHTML='';
+  document.getElementById('memStackBody').innerHTML=''; document.getElementById('memHeapBody').innerHTML='';
+  document.getElementById('satVarsBody').innerHTML='<div class="sat-empty">—</div>';
+  document.getElementById('satStackBody').innerHTML='<div class="sat-empty">—</div>';
+  document.getElementById('satConsoleBody').innerHTML='<div class="sat-empty">—</div>';
+  document.getElementById('breadcrumb').innerHTML='';
+  document.getElementById('orbLabel').textContent='Error';
+  document.getElementById('orbSub').textContent='Fix the code and run again';
+  document.getElementById('orbCore').style.setProperty('--orbc','#ff5d7a');
+  document.querySelector('.orb').style.setProperty('--orbc','#ff5d7a');
+  markExecLine(-1);
+}
+
+const STEP_ICON = { declare:'＋', assign:'＝', increment:'↻', condition:'◆', call:'↘', return:'↖', output:'▤' };
+function renderTimeline(){
+  const tl=document.getElementById('timeline'); tl.innerHTML='';
+  const minDepth = Math.min(...trace.map(s=>s.depth));
+  trace.forEach((s,idx)=>{
+    const div=document.createElement('div');
+    div.className='v-step'+(idx<cur?' done':'')+(idx===cur?' current':'');
+    const indent = Math.min(s.depth-minDepth,6)*12;
+    div.style.marginLeft = indent+'px';
+    const icon = STEP_ICON[s.type]||'•';
+    div.innerHTML=`<div class="v-dot">${indent>0?'':''}</div><div class="v-txt"><div class="v-type"><span class="v-icon">${icon}</span>${idx+1}. ${s.type}</div><div class="v-line">line ${s.line}${s.depth>minDepth?' · depth '+(s.depth-minDepth+1):''}</div></div>`;
+    div.onclick=()=>{ stopPlay(); goto(idx); };
+    tl.appendChild(div);
+  });
+  const el=tl.children[cur]; if(el) scrollWithinContainer(el, tl);
+}
+/* Generic contained auto-scroll: moves ONLY the given scrollable container,
+   never the page. Used for both the timeline rail and (defensively) anywhere
+   else we bring an element into view. */
+function scrollWithinContainer(el, container){
+  const elTop = el.offsetTop, elBottom = elTop + el.offsetHeight;
+  const viewTop = container.scrollTop, viewBottom = viewTop + container.clientHeight;
+  if(elTop < viewTop) container.scrollTop = elTop - 8;
+  else if(elBottom > viewBottom) container.scrollTop = elBottom - container.clientHeight + 8;
+}
+
+function renderBreadcrumb(){
+  const s=trace[cur];
+  const bc=document.getElementById('breadcrumb');
+  bc.innerHTML = s.callStack.map((f,idx)=>{
+    const isLast = idx===s.callStack.length-1;
+    const label = f.name.length>26 ? f.name.slice(0,26)+'…' : f.name;
+    return (idx>0?'<span class="bc-sep">→</span>':'') + `<span class="bc-item${isLast?' bc-current':''}">${escapeHtml(label)}</span>`;
+  }).join('');
+}
+
+function renderOrb(){
+  const s=trace[cur];
+  const color = ORB_COLORS[s.type] || '#3d8bff';
+  document.getElementById('orbCore').style.setProperty('--orbc', color);
+  document.querySelector('.orb').style.setProperty('--orbc', color);
+  document.getElementById('orbLabel').textContent = (ORB_ICON_LABEL[s.type]||'Executing') + ' — line ' + s.line;
+  document.getElementById('orbSub').textContent = s.code || '(block)';
+  document.getElementById('stepPill').textContent = `Step ${cur+1} of ${trace.length}`;
+}
+
+function renderSatellites(){
+  const s=trace[cur];
+  const vBody=document.getElementById('satVarsBody');
+  vBody.innerHTML = s.vars.length ? s.vars.slice(0,4).map(v=>`<div class="sat-row"><span>${v.name}</span><b>${formatVal(v.value)}</b></div>`).join('') : '<div class="sat-empty">no variables yet</div>';
+  const stBody=document.getElementById('satStackBody');
+  stBody.innerHTML = s.callStack.slice().reverse().slice(0,3).map(f=>`<div class="sat-row"><span>${f.name.length>18?f.name.slice(0,18)+'…':f.name}</span></div>`).join('');
+  const cBody=document.getElementById('satConsoleBody');
+  const lastOuts = s.output.slice(-2);
+  cBody.innerHTML = lastOuts.length ? lastOuts.map(o=>`<div class="sat-row"><b>${escapeHtml(o)}</b></div>`).join('') : '<div class="sat-empty">no output yet</div>';
+}
+
+function renderVars(){
+  const body=document.getElementById('varsBody'); const s=trace[cur]; const prev=cur>0?trace[cur-1]:null;
+  if(!s.vars.length){ body.innerHTML=`<tr><td colspan="3" class="var-empty">No variables in scope yet.</td></tr>`; return; }
+  body.innerHTML=s.vars.map((v,idx)=>{
+    const prevRow=prev?prev.vars.find(p=>p.name===v.name):null;
+    const changed=!prevRow||JSON.stringify(prevRow.value)!==JSON.stringify(v.value);
+    let delta = '';
+    if(changed && prevRow && typeof v.value==='number' && typeof prevRow.value==='number'){
+      const d = v.value - prevRow.value;
+      delta = `<span class="var-delta">${d>=0?'+':''}${d}</span>`;
+    }
+    return `<tr class="${changed?'changed':''}" style="animation-delay:${idx*40}ms"><td>${v.name}</td><td>${formatVal(v.value)}${delta}</td><td>${v.tYpe}</td></tr>`;
+  }).join('');
+}
+
+function renderStack(){
+  const s=trace[cur];
+  document.getElementById('stackBody').innerHTML = s.callStack.slice().reverse().map(f=>`<div class="stack-frame"><div class="fname">${f.name}</div><div class="fline">(line ${f.line})</div></div>`).join('');
+}
+
+function renderMem(){
+  const s=trace[cur];
+  const stackVars = s.vars.filter(v=>!v.isRef);
+  const heapVars = s.vars.filter(v=>v.isRef);
+  document.getElementById('memStackBody').innerHTML = stackVars.length ? stackVars.map(v=>`
+    <div class="mem-block"><span class="k">${v.name}</span> = <span class="v">${formatVal(v.value)}</span></div>`).join('') : '<div class="mem-empty">empty</div>';
+  document.getElementById('memHeapBody').innerHTML = heapVars.length ? heapVars.map(v=>`
+    <div class="mem-block heap-block"><span class="k">${v.name}</span> → <span class="v">${formatVal(v.value)}</span><span class="addr">${v.addr}</span></div>`).join('') : '<div class="mem-empty">no heap allocations</div>';
+}
+
+let consoleTypeToken=0;
+function renderConsole(){
+  const s=trace[cur]; const body=document.getElementById('consoleBody'); const myToken=++consoleTypeToken;
+  const priorLines=s.output.slice(0,-1); const lastLine=s.output.length?s.output[s.output.length-1]:null;
+  body.innerHTML=priorLines.map(l=>`<div class="console-line">${escapeHtml(l)}</div>`).join('');
+  if(lastLine===null) return;
+  const lineEl=document.createElement('div'); lineEl.className='console-line';
+  const caret=document.createElement('span'); caret.className='caret'; caret.textContent='\u00A0';
+  body.appendChild(lineEl); lineEl.appendChild(caret);
+  let i=0; const speed=Math.max(4,Math.min(18,260/Math.max(lastLine.length,1)));
+  (function tick(){
+    if(myToken!==consoleTypeToken) return;
+    if(i<=lastLine.length){ lineEl.textContent=lastLine.slice(0,i); lineEl.appendChild(caret); i++; setTimeout(tick,speed); }
+    else caret.remove();
+  })();
+}
+
+let aiTypeToken=0;
+function renderAI(){
+  const target=explain(trace[cur], mentorLevel); const body=document.getElementById('aiBody'); const myToken=++aiTypeToken;
+  const chunks=target.split(/(<[^>]+>)/g).filter(x=>x.length);
+  body.innerHTML='';
+  let ci=0,charIdx=0;
+  (function tick(){
+    if(myToken!==aiTypeToken) return;
+    if(ci>=chunks.length) return;
+    const chunk=chunks[ci];
+    if(chunk.startsWith('<')){ body.innerHTML+=chunk; ci++; setTimeout(tick,0); return; }
+    body.innerHTML+=chunk[charIdx]; charIdx++;
+    if(charIdx>=chunk.length){ ci++; charIdx=0; }
+    setTimeout(tick,12);
+  })();
+}
+
+function renderAll(){
+  renderTimeline(); renderOrb(); renderBreadcrumb(); renderSatellites(); renderVars(); renderStack(); renderMem(); renderConsole(); renderAI();
+  markExecLine(trace[cur].line);
+  document.getElementById('tPrev').style.opacity=cur===0?0.4:1;
+  document.getElementById('tNext').style.opacity=cur===trace.length-1?0.4:1;
+}
+function goto(idx){ if(!trace.length) return; cur=Math.max(0,Math.min(trace.length-1,idx)); renderAll(); }
+
+document.getElementById('tPrev').onclick=()=>{ stopPlay(); goto(cur-1); };
+document.getElementById('tNext').onclick=()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnInto').onclick=()=>{ stopPlay(); goto(cur+1); };
+document.getElementById('btnOver').onclick=()=>{
+  stopPlay(); if(!trace.length) return;
+  const startDepth=trace[cur].depth; let j=cur+1;
+  if(trace[j]&&trace[j].type==='call'){ while(j<trace.length-1&&trace[j].depth>startDepth) j++; }
+  goto(j);
+};
+document.getElementById('btnOut').onclick=()=>{
+  stopPlay(); if(!trace.length) return;
+  const startDepth=trace[cur].depth; let j=cur+1;
+  while(j<trace.length-1 && trace[j].depth>=startDepth) j++;
+  goto(j);
+};
+document.getElementById('btnReset').onclick=()=>{ stopPlay(); if(trace.length) goto(0); };
+document.getElementById('btnRun').onclick=()=>{ stopPlay(); runCode(); };
+document.getElementById('tPlay').onclick=()=>{ playing?stopPlay():startPlay(); };
+function startPlay(){ if(!trace.length) return; playing=true; document.getElementById('tPlay').textContent='⏸'; playTimer=setInterval(()=>{ if(cur>=trace.length-1){ stopPlay(); return; } goto(cur+1); },1100); }
+function stopPlay(){ playing=false; document.getElementById('tPlay').textContent='▶'; if(playTimer) clearInterval(playTimer); }
+
+document.querySelectorAll('.mlvl').forEach(el=>{
+  el.onclick=()=>{ document.querySelectorAll('.mlvl').forEach(x=>x.classList.remove('active')); el.classList.add('active'); mentorLevel=el.dataset.lvl; if(trace.length) renderAI(); };
+});
+
+document.getElementById('icCopy').onclick=()=>{ navigator.clipboard?.writeText(codeInput.value).catch(()=>{}); };
+document.getElementById('qaDownload').onclick=()=>{ const blob=new Blob([codeInput.value],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='main.js'; a.click(); };
+document.getElementById('qaShare').onclick=()=>{ navigator.clipboard?.writeText(JSON.stringify(trace,null,2)).catch(()=>{}); };
+document.getElementById('qaExample2').onclick=()=>{ codeInput.value=EXAMPLES.fib; syncEditor(); runCode(); };
+document.getElementById('btnExamples').onclick=()=>{
+  const keys=Object.keys(EXAMPLES); const currentIdx=Math.max(0,keys.findIndex(k=>EXAMPLES[k]===codeInput.value));
+  const nextKey=keys[(currentIdx+1)%keys.length]; codeInput.value=EXAMPLES[nextKey]; syncEditor(); runCode();
+};
+document.getElementById('langSelect').onchange=(e)=>{
+  if(e.target.value!=='javascript'){
+    errBox.style.display='block';
+    errBox.innerHTML = `<div class="err-title">Not built yet</div>${e.target.options[e.target.selectedIndex].text} needs its own real parser and execution engine — that doesn't exist yet, so CodeSutra won't pretend to run it. Switching back to JavaScript.`;
+    e.target.value='javascript';
+  }
+};
+
+(function initParticles(){
+  const box=document.getElementById('bgParticles'); const n=window.innerWidth<700?10:22;
+  for(let i=0;i<n;i++){ const dot=document.createElement('span'); dot.style.left=Math.random()*100+'vw'; dot.style.top=Math.random()*100+'vh'; dot.style.animationDuration=(18+Math.random()*22)+'s'; dot.style.animationDelay=(Math.random()*20)+'s'; dot.style.opacity=(0.15+Math.random()*0.25).toFixed(2); box.appendChild(dot); }
+})();
+
+codeInput.value=EXAMPLES.sum; syncEditor(); runCode();
+</script>
+</body>
+</html>
