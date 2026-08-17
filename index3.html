@@ -28,17 +28,22 @@
   @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
   ::-webkit-scrollbar{height:8px;width:8px;} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:4px;} ::-webkit-scrollbar-track{background:transparent;}
 
-  .glass{ background:var(--panel); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid var(--glass-border); border-radius:20px; }
+  .glass{ background:var(--panel); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid var(--glass-border); border-radius:20px; box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 20px 40px -20px rgba(0,0,0,.55); }
+  :focus-visible{ outline:2px solid var(--electric); outline-offset:2px; border-radius:6px; }
+  ::selection{ background:#3d8bff55; color:#fff; }
+  .hero{ box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 60px -24px rgba(0,0,0,.6), 0 0 0 1px rgba(61,139,255,.06); }
   .bg-particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
   .bg-particles span{position:absolute;width:3px;height:3px;border-radius:50%;background:#8a9bff;opacity:.3;animation:floatUp linear infinite;}
   @keyframes floatUp{ 0%{transform:translateY(0);opacity:0;} 10%{opacity:.3;} 90%{opacity:.3;} 100%{transform:translateY(-110vh) translateX(24px);opacity:0;} }
 
   .wrap{max-width:1520px;margin:0 auto;padding:22px 24px 48px;position:relative;z-index:1;}
-  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;margin-bottom:22px;flex-wrap:wrap;gap:12px;position:relative;}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12) 30%,rgba(255,255,255,.12) 70%,transparent);}
   .brand{display:flex;align-items:center;gap:13px;}
   .brand .logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--electric),var(--purple));display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 0 30px #3d8bff55;}
   .brand h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-0.03em;}
   .brand h1 span{background:linear-gradient(90deg,var(--electric),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .beta-tag{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--text-faint);background:rgba(255,255,255,.04);border:1px solid var(--glass-border);padding:3px 8px;border-radius:20px;vertical-align:middle;margin-left:4px;-webkit-text-fill-color:var(--text-faint);}
   .brand p{margin:2px 0 0;font-size:12.5px;color:var(--text-dim);}
   .hdr-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
   .pill{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-size:13px;color:var(--text);cursor:pointer;transition:.15s;}
@@ -129,6 +134,15 @@
   .mentor-hd{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--glass-border);flex-wrap:wrap;}
   .mentor-avatar{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--emerald),var(--electric));display:flex;align-items:center;justify-content:center;font-size:15px;}
   .mentor-levels{display:flex;gap:6px;margin-left:auto;}
+  .why-row{padding:0 18px 12px;}
+  .why-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#bcd6ff;background:#3d8bff14;border:1px solid #3d8bff44;padding:6px 12px;border-radius:9px;cursor:pointer;transition:.15s;}
+  .why-btn:hover{background:#3d8bff22;transform:translateY(-1px);}
+  .why-panel{margin:0 18px 18px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--glass-border);font-size:12.8px;line-height:1.7;}
+  .why-panel .why-line{display:flex;justify-content:space-between;padding:4px 0;font-family:var(--mono);border-top:1px solid var(--glass-border);}
+  .why-panel .why-line:first-child{border-top:none;}
+  .why-panel .why-k{color:var(--text-faint);}
+  .why-panel .why-v{color:var(--text);}
+  .why-panel .why-delta{color:var(--emerald);font-weight:700;}
   .mlvl{font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;}
   .mlvl.active{background:#3d8bff22;border-color:#3d8bff77;color:#bcd6ff;}
   .mentor-body{padding:16px 18px;font-size:13.5px;line-height:1.7;color:#cfd1e6;min-height:24px;}
@@ -168,6 +182,17 @@
   .mem-empty{font-size:11px;color:var(--text-faint);}
 
   .stack-frame{margin:0 0 10px;padding:10px 12px;border-radius:11px;background:#3d8bff12;border:1px solid #3d8bff44;animation:stackIn .32s cubic-bezier(.34,1.56,.64,1);}
+  .stackview-tabs{margin-left:auto;display:flex;gap:6px;}
+  .sv-tab{font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:7px;color:var(--text-faint);cursor:pointer;border:1px solid transparent;}
+  .sv-tab.active{color:#bcd6ff;background:#3d8bff1c;border-color:#3d8bff44;}
+  .tree-node{position:relative;}
+  .tree-children{margin-left:16px;padding-left:14px;border-left:1px dashed var(--glass-border);display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+  .tree-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;padding:5px 9px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid var(--glass-border);color:var(--text-faint);animation:stackIn .3s ease-out;}
+  .tree-row.active{color:#bcd6ff;background:#3d8bff1c;border-color:#3d8bff55;box-shadow:0 0 12px #3d8bff33;}
+  .tree-row.done{color:var(--text-dim);}
+  .tree-name{font-weight:700;}
+  .tree-ret{color:var(--emerald);font-size:10.5px;}
+  .tree-pending{color:var(--amber);font-size:10.5px;font-style:italic;}
   @keyframes stackIn{0%{opacity:0;transform:translateX(-12px) scale(.94);}100%{opacity:1;transform:translateX(0) scale(1);}}
   .stack-frame .fname{color:#a8c4ff;font-family:var(--mono);font-weight:700;font-size:12.5px;}
   .stack-frame .fline{color:var(--text-faint);font-size:10.5px;margin-top:2px;}
@@ -188,6 +213,12 @@
   .v-step.current .v-dot{border-color:var(--electric);background:var(--electric);box-shadow:0 0 8px var(--electric);}
   .v-step .v-txt{font-size:11.5px;}
   .v-step .v-type{font-weight:700;color:var(--text);}
+  .v-icon{display:inline-block;width:16px;text-align:center;margin-right:4px;color:var(--text-faint);font-weight:400;}
+  .v-step.current .v-icon{color:var(--electric);}
+  .breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;font-family:var(--mono);font-size:11.5px;}
+  .breadcrumb .bc-item{padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .breadcrumb .bc-item.bc-current{color:#bcd6ff;background:#3d8bff1c;border-color:#3d8bff55;}
+  .breadcrumb .bc-sep{color:var(--text-faint);}
   .v-step .v-line{color:var(--text-faint);font-family:var(--mono);}
 
   .qa-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;cursor:pointer;border-top:1px solid var(--glass-border);transition:background .15s;}
@@ -207,7 +238,7 @@
   <header>
     <div class="brand">
       <div class="logo">⟨/⟩</div>
-      <div><h1>Code<span>Sutra</span></h1><p>Don't just read code. See how it works.</p></div>
+      <div><h1>Code<span>Sutra</span> <span class="beta-tag">JS Engine · v1</span></h1><p>Don't just read code. See how it works.</p></div>
     </div>
     <div class="hdr-actions">
       <select class="pill glass" id="langSelect">
@@ -265,6 +296,7 @@
           </div>
         </div>
 
+        <div class="breadcrumb" id="breadcrumb"></div>
         <div class="core-canvas" id="coreCanvas">
           <svg viewBox="0 0 600 400" preserveAspectRatio="none">
             <path class="flow-path" id="pathVars" d="M300,200 C220,150 150,110 110,80" stroke="#3d8bff"/>
@@ -307,6 +339,10 @@
           </div>
         </div>
         <div class="mentor-body" id="aiBody">Click <b>Run</b> to execute your code — I'll explain every step as it happens.</div>
+        <div class="why-row" id="whyRow" style="display:none;">
+          <div class="why-btn" id="btnWhy">Why did this happen? ▾</div>
+        </div>
+        <div class="why-panel" id="whyPanel" style="display:none;"></div>
       </section>
 
       <!-- LOWER GRID -->
@@ -325,7 +361,12 @@
         </section>
 
         <section class="glass lower-card">
-          <div class="lower-hd"><span class="dot"></span>Call Stack</div>
+          <div class="lower-hd"><span class="dot"></span>Call Stack
+            <div class="stackview-tabs">
+              <span class="sv-tab active" data-view="stack" id="svStack">Stack</span>
+              <span class="sv-tab" data-view="tree" id="svTree">Recursion Tree</span>
+            </div>
+          </div>
           <div class="lower-body-pad" id="stackBody"></div>
         </section>
       </div>
@@ -386,7 +427,7 @@ function tokenize(src){
     if(isIdentStart(c)){ let j=i,s=''; while(j<n&&isIdentPart(src[j])){ s+=src[j]; j++; } tokens.push({type:KEYWORDS.has(s)?'kw':'ident',value:s,line}); i=j; continue; }
     const three=src.slice(i,i+3), two=src.slice(i,i+2);
     if(['===','!=='].includes(three)){ tokens.push({type:'op',value:three,line}); i+=3; continue; }
-    if(['==','!=','<=','>=','&&','||','++','--','+=','-=','*=','/=','%='].includes(two)){ tokens.push({type:'op',value:two,line}); i+=2; continue; }
+    if(['==','!=','<=','>=','&&','||','++','--','+=','-=','*=','/=','%=','=>'].includes(two)){ tokens.push({type:'op',value:two,line}); i+=2; continue; }
     if('+-*/%<>=!'.includes(c)){ tokens.push({type:'op',value:c,line}); i++; continue; }
     if('(){}[],;.:'.includes(c)){ tokens.push({type:'punc',value:c,line}); i++; continue; }
     throw new SyntaxError(`Unexpected character '${c}' at line ${line}`);
@@ -415,6 +456,18 @@ class Parser{
     return this.parseExprStatement();
   }
   consumeSemi(){ if(this.at('punc',';')) this.next(); }
+  parseParamList(){
+    const params=[];
+    if(!this.at('punc',')')){
+      do{
+        const nameTok=this.expect('ident');
+        let def=null;
+        if(this.at('op','=')){ this.next(); def=this.parseAssign(); }
+        params.push({name:nameTok.value, default:def});
+      } while(this.at('punc',',')&&this.next());
+    }
+    return params;
+  }
   parseVarDecl(consumeSemiAfter){
     const kindTok=this.next(); const line=kindTok.line; const decls=[];
     do{ const idTok=this.expect('ident'); let init=null; if(this.at('op','=')){ this.next(); init=this.parseAssign(); } decls.push({id:idTok.value,init}); } while(this.at('punc',',')&&this.next());
@@ -444,14 +497,43 @@ class Parser{
   parseDoWhile(){ const line=this.next().line; const body=this.parseStatement(); this.expect('kw','while'); this.expect('punc','('); const test=this.parseExpr(); this.expect('punc',')'); this.consumeSemi(); return {type:'DoWhile',test,body,line}; }
   parseFuncDecl(){
     const line=this.next().line; const name=this.expect('ident').value; this.expect('punc','(');
-    const params=[]; if(!this.at('punc',')')){ do{ params.push(this.expect('ident').value); } while(this.at('punc',',')&&this.next()); }
+    const params=this.parseParamList();
     this.expect('punc',')'); const body=this.parseBlock();
     return {type:'FuncDecl',name,params,body,line};
   }
   parseReturn(){ const line=this.next().line; let arg=null; if(!this.at('punc',';')&&!this.at('punc','}')) arg=this.parseExpr(); this.consumeSemi(); return {type:'Return',arg,line}; }
   parseExprStatement(){ const line=this.peek().line; const expr=this.parseExpr(); this.consumeSemi(); return {type:'ExprStatement',expr,line}; }
   parseExpr(){ return this.parseAssign(); }
+
+  tryParseArrowParams(){
+    const savedPos=this.pos;
+    try{
+      this.expect('punc','(');
+      const params=this.parseParamList();
+      if(!this.at('punc',')')){ this.pos=savedPos; return null; }
+      this.next();
+      if(!this.at('op','=>')){ this.pos=savedPos; return null; }
+      this.next();
+      return params;
+    }catch(e){ this.pos=savedPos; return null; }
+  }
+
   parseAssign(){
+    // arrow fn: single bare identifier param  ->  x => x*2
+    if(this.at('ident') && this.peek(1) && this.peek(1).type==='op' && this.peek(1).value==='=>'){
+      const nameTok=this.next(); this.next();
+      const body = this.at('punc','{') ? this.parseBlock() : this.parseAssign();
+      return {type:'Arrow', params:[{name:nameTok.value,default:null}], body, isBlock: body.type==='Block', line:nameTok.line};
+    }
+    // arrow fn: parenthesized params  ->  (a,b) => a+b
+    if(this.at('punc','(')){
+      const startLine=this.peek().line;
+      const params=this.tryParseArrowParams();
+      if(params){
+        const body = this.at('punc','{') ? this.parseBlock() : this.parseAssign();
+        return {type:'Arrow', params, body, isBlock: body.type==='Block', line:startLine};
+      }
+    }
     const left=this.parseLogicalOr();
     if(this.at('op')&&['=','+=','-=','*=','/=','%='].includes(this.peek().value)){ const op=this.next().value; const right=this.parseAssign(); return {type:'Assign',op,left,right,line:left.line}; }
     return left;
@@ -487,7 +569,26 @@ class Parser{
     if(t.type==='kw'&&t.value==='null'){ this.next(); return {type:'Literal',value:null,line:t.line}; }
     if(t.type==='ident'){ this.next(); return {type:'Ident',name:t.value,line:t.line}; }
     if(t.type==='punc'&&t.value==='('){ this.next(); const e=this.parseExpr(); this.expect('punc',')'); return e; }
-    if(t.type==='punc'&&t.value==='['){ this.next(); const elements=[]; if(!this.at('punc',']')){ do{ elements.push(this.parseAssign()); } while(this.at('punc',',')&&this.next()); } this.expect('punc',']'); return {type:'ArrayLit',elements,line:t.line}; }
+    if(t.type==='punc'&&t.value==='['){
+      this.next(); const elements=[];
+      if(!this.at('punc',']')){ do{ elements.push(this.parseAssign()); } while(this.at('punc',',')&&this.next()); }
+      this.expect('punc',']');
+      return {type:'ArrayLit',elements,line:t.line};
+    }
+    if(t.type==='punc'&&t.value==='{'){
+      this.next(); const props=[];
+      if(!this.at('punc','}')){
+        do{
+          let key;
+          if(this.at('str')) key=this.next().value; else key=this.expect('ident').value;
+          this.expect('punc',':');
+          const val=this.parseAssign();
+          props.push({key,value:val});
+        } while(this.at('punc',',')&&this.next());
+      }
+      this.expect('punc','}');
+      return {type:'ObjectLit',props,line:t.line};
+    }
     throw new SyntaxError(`Unexpected token '${t.value}' at line ${t.line}`);
   }
 }
@@ -506,7 +607,7 @@ class BreakSignal{} class ContinueSignal{}
 class Interpreter{
   constructor(src){
     this.src=src; this.lines=src.split('\n'); this.trace=[]; this.output=[];
-    this.callStack=[{name:'main()',line:1}]; this.stepGuard=6000; this.stepsUsed=0;
+    this.callStack=[{name:'main()',line:1}]; this.stepGuard=8000; this.stepsUsed=0;
     this.heapAddr=new WeakMap(); this.heapCounter=0x1000;
   }
   lineText(line){ return (this.lines[line-1]||'').trim(); }
@@ -514,19 +615,22 @@ class Interpreter{
   run(){
     const ast=new Parser(tokenize(this.src)).parseProgram();
     this.globalEnv=new Environment(null,'global');
+    this.globalEnv.declare('Math', Math);
     ast.body.forEach(node=>{ if(node.type==='FuncDecl') this.globalEnv.declare(node.name,{type:'function',node,closure:this.globalEnv}); });
     try{ this.execBlockBody(ast.body,this.globalEnv); }catch(e){ if(!(e instanceof ReturnSignal)) throw e; }
     return this.trace;
   }
   guard(){ this.stepsUsed++; if(this.stepsUsed>this.stepGuard) throw new Error('Execution stopped: too many steps (possible infinite loop).'); }
+  isHeap(v){ return v!==null && typeof v==='object'; }
   snapshotVars(env){
     const seen=new Set(); const rows=[]; let e=env;
     while(e){
       for(const [k,v] of e.vars.entries()){
         if(seen.has(k)) continue; seen.add(k);
         if(v&&v.type==='function') continue;
-        const isRef=Array.isArray(v);
-        rows.push({name:k,value:v,tYpe:isRef?'array':typeof v,isRef,addr:isRef?this.addressFor(v):null});
+        if(k==='Math') continue;
+        const isRef=this.isHeap(v);
+        rows.push({name:k,value:v,tYpe:Array.isArray(v)?'array':(isRef?'object':typeof v),isRef,addr:isRef?this.addressFor(v):null});
       }
       if(e.label==='function') break;
       e=e.parent;
@@ -607,25 +711,41 @@ class Interpreter{
     if(node.type==='Literal') return JSON.stringify(node.value);
     return '';
   }
+  bindParams(params, args, fnEnv){
+    params.forEach((p,idx)=>{
+      let val=args[idx];
+      if(val===undefined && p.default) val=this.evalExpr(p.default, fnEnv);
+      fnEnv.declare(p.name, val);
+    });
+  }
   callFunction(fnVal,args,line,env){
     if(this.callStack.length>800) throw new Error('Stack overflow: recursion too deep.');
     const frameName=(fnVal.node.name||'anonymous')+'('+args.map(a=>this.stringify(a)).join(', ')+')';
     this.callStack.push({name:frameName,line:fnVal.node.line});
     this.emit('call',line,env,{name:frameName});
     const fnEnv=new Environment(fnVal.closure,'function');
-    fnVal.node.params.forEach((p,idx)=>fnEnv.declare(p,args[idx]));
+    this.bindParams(fnVal.node.params, args, fnEnv);
     let ret;
     try{ this.execBlockBody(fnVal.node.body.body,fnEnv); ret=undefined; }
     catch(e){ if(e instanceof ReturnSignal) ret=e.value; else throw e; }
     this.callStack.pop();
     return ret;
   }
-  stringify(v){ if(Array.isArray(v)) return '['+v.map(x=>this.stringify(x)).join(', ')+']'; if(typeof v==='string') return v; if(v===undefined) return 'undefined'; if(v===null) return 'null'; return String(v); }
+  stringify(v){
+    if(Array.isArray(v)) return '['+v.map(x=>this.stringify(x)).join(', ')+']';
+    if(v&&typeof v==='object'){ try{ return JSON.stringify(v); }catch(e){ return '[object]'; } }
+    if(typeof v==='string') return v; if(v===undefined) return 'undefined'; if(v===null) return 'null'; return String(v);
+  }
   evalExpr(node,env,isStatementLevel){
     switch(node.type){
       case 'Literal': return node.value;
       case 'ArrayLit': return node.elements.map(e=>this.evalExpr(e,env));
-      case 'Ident': return env.get(node.name);
+      case 'ObjectLit': { const obj={}; node.props.forEach(p=>{ obj[p.key]=this.evalExpr(p.value,env); }); return obj; }
+      case 'Arrow': {
+        const body = node.isBlock ? node.body : {type:'Block', body:[{type:'Return',arg:node.body,line:node.line}]};
+        return {type:'function', node:{name:null, params:node.params, body, line:node.line}, closure:env};
+      }
+      case 'Ident': { if(node.name==='undefined' && !env.has('undefined')) return undefined; return env.get(node.name); }
       case 'Unary': { const v=this.evalExpr(node.arg,env); if(node.op==='!') return !v; if(node.op==='-') return -v; if(node.op==='+') return +v; break; }
       case 'Update': {
         let oldVal,newVal;
@@ -643,6 +763,17 @@ class Interpreter{
       }
       case 'Logical': { const l=this.evalExpr(node.left,env); if(node.op==='&&') return l?this.evalExpr(node.right,env):l; if(node.op==='||') return l?l:this.evalExpr(node.right,env); break; }
       case 'Assign': {
+        if(node.left.type==='ArrayLit'){
+          const rVal=this.evalExpr(node.right,env);
+          if(!Array.isArray(rVal)) throw new TypeError('Right-hand side of array destructuring must be an array');
+          node.left.elements.forEach((el,idx)=>{
+            const val=rVal[idx];
+            if(el.type==='Ident') env.set(el.name,val);
+            else if(el.type==='Member'){ const obj=this.evalExpr(el.object,env); const key=el.computed?this.evalExpr(el.property,env):el.property.value; obj[key]=val; }
+          });
+          this.emit('assign',node.line,env,{code:'destructuring assignment'});
+          return rVal;
+        }
         let rVal=this.evalExpr(node.right,env);
         if(node.left.type==='Ident'){
           if(node.op!=='='){ const cur=env.get(node.left.name); rVal=this.applyCompound(node.op,cur,rVal); }
@@ -652,7 +783,7 @@ class Interpreter{
           const obj=this.evalExpr(node.left.object,env); const key=node.left.computed?this.evalExpr(node.left.property,env):node.left.property.value;
           if(node.op!=='='){ rVal=this.applyCompound(node.op,obj[key],rVal); }
           obj[key]=rVal;
-          this.emit('assign',node.line,env,{code:'array/element update'});
+          this.emit('assign',node.line,env,{code:'element/property update'});
         }
         return rVal;
       }
@@ -662,13 +793,30 @@ class Interpreter{
           const args=node.args.map(a=>this.evalExpr(a,env)); const text=args.map(a=>this.stringify(a)).join(' ');
           this.output.push(text); this.emit('output',node.line,env,{text}); return undefined;
         }
+        if(node.callee.type==='Member'){
+          const obj=this.evalExpr(node.callee.object,env);
+          const key=node.callee.computed?this.evalExpr(node.callee.property,env):node.callee.property.value;
+          const fn=obj==null?undefined:obj[key];
+          const args=node.args.map(a=>this.evalExpr(a,env));
+          if(typeof fn==='function'){
+            this.emit('call',node.line,env,{name:key+'(...)',native:true});
+            return fn.apply(obj,args);
+          }
+          if(fn&&fn.type==='function') return this.callFunction(fn,args,node.line,env);
+          throw new TypeError(`${key} is not a function`);
+        }
         if(node.callee.type==='Ident'){
           const fnVal=env.get(node.callee.name);
-          if(!fnVal||fnVal.type!=='function') throw new TypeError(`${node.callee.name} is not a function`);
           const args=node.args.map(a=>this.evalExpr(a,env));
-          return this.callFunction(fnVal,args,node.line,env);
+          if(fnVal&&fnVal.type==='function') return this.callFunction(fnVal,args,node.line,env);
+          if(typeof fnVal==='function') return fnVal.apply(null,args);
+          throw new TypeError(`${node.callee.name} is not a function`);
         }
-        throw new Error('Unsupported call expression');
+        const calleeVal=this.evalExpr(node.callee,env);
+        const args=node.args.map(a=>this.evalExpr(a,env));
+        if(calleeVal&&calleeVal.type==='function') return this.callFunction(calleeVal,args,node.line,env);
+        if(typeof calleeVal==='function') return calleeVal.apply(null,args);
+        throw new Error('Value is not callable');
       }
       default: throw new Error('Unknown expression: '+node.type);
     }
@@ -706,7 +854,7 @@ function explain(step, level){
   if(level==='intermediate') return base + `<br><span style="color:#9294ad;font-size:12px;">Call depth: ${step.depth} · line ${step.line}</span>`;
   return base + `<br><span style="color:#9294ad;font-size:12px;">Event: <code>${step.type}</code> · depth ${step.depth} · line ${step.line} · vars in scope: ${step.vars.map(v=>v.name).join(', ')||'none'}</span>`;
 }
-function formatVal(v){ if(Array.isArray(v)) return '['+v.map(formatVal).join(', ')+']'; if(typeof v==='string') return '"'+v+'"'; if(v===undefined) return 'undefined'; return String(v); }
+function formatVal(v){ if(Array.isArray(v)) return '['+v.map(formatVal).join(', ')+']'; if(v&&typeof v==='object') return '{'+Object.keys(v).map(k=>k+': '+formatVal(v[k])).join(', ')+'}'; if(typeof v==='string') return '"'+v+'"'; if(v===undefined) return 'undefined'; return String(v); }
 function escapeHtml(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
 /* ================= UI wiring ================= */
@@ -718,6 +866,40 @@ for (let i = 1; i <= 3; i++) {
 }
 
 console.log(sum);`,
+  binarySearch: `function binarySearch(arr, target) {
+    let lo = 0, hi = arr.length - 1;
+
+    while (lo <= hi) {
+        let mid = Math.floor((lo + hi) / 2);
+        if (arr[mid] === target) {
+            return mid;
+        }
+        if (arr[mid] < target) {
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return -1;
+}
+
+let sorted = [2, 5, 8, 12, 16, 23, 38, 45];
+console.log(binarySearch(sorted, 23));`,
+  twoSum: `function twoSum(nums, target) {
+    let seen = {};
+
+    for (let i = 0; i < nums.length; i++) {
+        let need = target - nums[i];
+        if (seen[need] !== undefined) {
+            return [seen[need], i];
+        }
+        seen[nums[i]] = i;
+    }
+    return [];
+}
+
+let nums = [2, 7, 11, 15];
+console.log(twoSum(nums, 9));`,
   fib: `function fib(n) {
     if (n <= 1) {
         return n;
@@ -734,10 +916,71 @@ for (let i = 0; i < nums.length; i++) {
     total += nums[i];
 }
 
-console.log(total);`
+console.log(total);`,
+  quicksort: `function quickSort(arr, low = 0, high = arr.length - 1) {
+    if (low >= high) {
+        return;
+    }
+    const pivotIndex = partition(arr, low, high);
+    quickSort(arr, low, pivotIndex - 1);
+    quickSort(arr, pivotIndex + 1, high);
+}
+
+function partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+
+    for (let j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    return i + 1;
+}
+
+let numbers = [42, 17, 8, 99, 23, 4, 12];
+console.log("Before:", numbers);
+quickSort(numbers);
+console.log("After:", numbers);`
 };
 
-let trace=[], cur=0, playing=false, playTimer=null, mentorLevel='beginner';
+let trace=[], cur=0, playing=false, playTimer=null, mentorLevel='beginner', recursionTree=null, stackView='stack', whyOpen=false;
+
+/* Builds a real recursion tree from the trace's call/return events — every
+   node here corresponds to an actual call/return pair that happened during
+   execution. Nothing is invented; a function that was never called simply
+   never gets a node. */
+function buildRecursionTree(trace){
+  const root={name:'main()', children:[], callIdx:-1, returnIdx:null, returnValue:undefined};
+  const stack=[root];
+  trace.forEach((s,idx)=>{
+    if(s.type==='call'){
+      const node={name:s.extra.name, children:[], callIdx:idx, returnIdx:null, returnValue:undefined};
+      stack[stack.length-1].children.push(node);
+      stack.push(node);
+    } else if(s.type==='return'){
+      const node=stack.pop();
+      if(node){ node.returnIdx=idx; node.returnValue=s.extra.value; }
+    }
+  });
+  return root;
+}
+function renderTreeNode(node, curIdx, isRoot){
+  if(node.callIdx>curIdx) return ''; // hasn't happened yet at this point in the trace
+  const active = node.callIdx<=curIdx && (node.returnIdx===null || node.returnIdx>curIdx);
+  const done = node.returnIdx!==null && node.returnIdx<=curIdx;
+  const childrenHtml = node.children.map(c=>renderTreeNode(c,curIdx,false)).join('');
+  const retTag = done ? `<span class="tree-ret">↩ ${formatVal(node.returnValue)}</span>` : (active ? `<span class="tree-pending">running…</span>` : '');
+  return `<div class="tree-node${isRoot?' tree-root':''}">
+      <div class="tree-row${active?' active':''}${done?' done':''}">
+        <span class="tree-name">${escapeHtml(node.name)}</span>${retTag}
+      </div>
+      ${childrenHtml ? `<div class="tree-children">${childrenHtml}</div>` : ''}
+    </div>`;
+}
 const codeInput=document.getElementById('codeInput');
 const codeHighlight=document.getElementById('codeHighlight');
 const gutter=document.getElementById('gutter');
@@ -770,8 +1013,26 @@ function markExecLine(line){
   if(line&&line>0){
     bar.style.display='block'; bar.style.top=(16+(line-1)*LINE_H)+'px'; bar.style.height=LINE_H+'px';
     bar.classList.remove('exec-flash'); void bar.offsetWidth; bar.classList.add('exec-flash');
-    const activeLn=gutter.querySelector('.ln.exec'); if(activeLn) activeLn.scrollIntoView({block:'nearest'});
+    scrollLineIntoViewContained(line);
   } else bar.style.display='none';
+}
+/* Keeps the executing line visible WITHOUT ever touching the page/window scroll —
+   only the editor's own internal scroll box moves (the textarea is the real
+   scroll master; the highlighted <pre> and gutter just follow it). */
+function scrollLineIntoViewContained(line){
+  const ta = codeInput;
+  const lineTop = 16 + (line-1)*LINE_H;
+  const lineBottom = lineTop + LINE_H;
+  const viewTop = ta.scrollTop;
+  const viewBottom = viewTop + ta.clientHeight;
+  let newTop = null;
+  if(lineTop < viewTop) newTop = lineTop - 12;
+  else if(lineBottom > viewBottom) newTop = lineBottom - ta.clientHeight + 12;
+  if(newTop !== null){
+    ta.scrollTop = Math.max(0,newTop);
+    codeHighlight.parentElement.scrollTop = ta.scrollTop;
+    gutter.scrollTop = ta.scrollTop;
+  }
 }
 
 const ORB_COLORS = { declare:'#3d8bff', assign:'#3d8bff', increment:'#3d8bff', condition:'#f5b84e', call:'#9b6bff', return:'#22e8a8', output:'#22e8a8' };
@@ -814,6 +1075,7 @@ function runCode(){
     const interp=new Interpreter(src);
     trace=interp.run();
     if(trace.length===0) throw new Error('Nothing to trace — did you write any executable statements?');
+    recursionTree=buildRecursionTree(trace);
     cur=0; statusBar.classList.remove('err');
     document.getElementById('readyLabel').textContent='Ready';
     document.getElementById('stepCount').textContent='Steps: '+trace.length;
@@ -837,6 +1099,9 @@ function resetPanelsToEmpty(){
   document.getElementById('satVarsBody').innerHTML='<div class="sat-empty">—</div>';
   document.getElementById('satStackBody').innerHTML='<div class="sat-empty">—</div>';
   document.getElementById('satConsoleBody').innerHTML='<div class="sat-empty">—</div>';
+  document.getElementById('breadcrumb').innerHTML='';
+  document.getElementById('whyRow').style.display='none';
+  document.getElementById('whyPanel').style.display='none'; whyOpen=false;
   document.getElementById('orbLabel').textContent='Error';
   document.getElementById('orbSub').textContent='Fix the code and run again';
   document.getElementById('orbCore').style.setProperty('--orbc','#ff5d7a');
@@ -844,16 +1109,40 @@ function resetPanelsToEmpty(){
   markExecLine(-1);
 }
 
+const STEP_ICON = { declare:'＋', assign:'＝', increment:'↻', condition:'◆', call:'↘', return:'↖', output:'▤' };
 function renderTimeline(){
   const tl=document.getElementById('timeline'); tl.innerHTML='';
+  const minDepth = Math.min(...trace.map(s=>s.depth));
   trace.forEach((s,idx)=>{
     const div=document.createElement('div');
     div.className='v-step'+(idx<cur?' done':'')+(idx===cur?' current':'');
-    div.innerHTML=`<div class="v-dot"></div><div class="v-txt"><div class="v-type">${idx+1}. ${s.type}</div><div class="v-line">line ${s.line}</div></div>`;
+    const indent = Math.min(s.depth-minDepth,6)*12;
+    div.style.marginLeft = indent+'px';
+    const icon = STEP_ICON[s.type]||'•';
+    div.innerHTML=`<div class="v-dot">${indent>0?'':''}</div><div class="v-txt"><div class="v-type"><span class="v-icon">${icon}</span>${idx+1}. ${s.type}</div><div class="v-line">line ${s.line}${s.depth>minDepth?' · depth '+(s.depth-minDepth+1):''}</div></div>`;
     div.onclick=()=>{ stopPlay(); goto(idx); };
     tl.appendChild(div);
   });
-  const el=tl.children[cur]; if(el) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  const el=tl.children[cur]; if(el) scrollWithinContainer(el, tl);
+}
+/* Generic contained auto-scroll: moves ONLY the given scrollable container,
+   never the page. Used for both the timeline rail and (defensively) anywhere
+   else we bring an element into view. */
+function scrollWithinContainer(el, container){
+  const elTop = el.offsetTop, elBottom = elTop + el.offsetHeight;
+  const viewTop = container.scrollTop, viewBottom = viewTop + container.clientHeight;
+  if(elTop < viewTop) container.scrollTop = elTop - 8;
+  else if(elBottom > viewBottom) container.scrollTop = elBottom - container.clientHeight + 8;
+}
+
+function renderBreadcrumb(){
+  const s=trace[cur];
+  const bc=document.getElementById('breadcrumb');
+  bc.innerHTML = s.callStack.map((f,idx)=>{
+    const isLast = idx===s.callStack.length-1;
+    const label = f.name.length>26 ? f.name.slice(0,26)+'…' : f.name;
+    return (idx>0?'<span class="bc-sep">→</span>':'') + `<span class="bc-item${isLast?' bc-current':''}">${escapeHtml(label)}</span>`;
+  }).join('');
 }
 
 function renderOrb(){
@@ -894,7 +1183,12 @@ function renderVars(){
 
 function renderStack(){
   const s=trace[cur];
-  document.getElementById('stackBody').innerHTML = s.callStack.slice().reverse().map(f=>`<div class="stack-frame"><div class="fname">${f.name}</div><div class="fline">(line ${f.line})</div></div>`).join('');
+  const body=document.getElementById('stackBody');
+  if(stackView==='tree' && recursionTree){
+    body.innerHTML = renderTreeNode(recursionTree, cur, true);
+  } else {
+    body.innerHTML = s.callStack.slice().reverse().map(f=>`<div class="stack-frame"><div class="fname">${f.name}</div><div class="fline">(line ${f.line})</div></div>`).join('');
+  }
 }
 
 function renderMem(){
@@ -925,7 +1219,68 @@ function renderConsole(){
 }
 
 let aiTypeToken=0;
+/* Substitutes identifier names in a snippet of source text with their CURRENT
+   values from the real trace snapshot. Best-effort (whole-identifier only —
+   it won't reach into arr[j] or obj.prop), but every value shown is real,
+   never invented. */
+function substituteVars(text, vars){
+  if(!text) return text;
+  let out = text;
+  const byLen = vars.slice().sort((a,b)=>b.name.length-a.name.length);
+  byLen.forEach(v=>{
+    const re = new RegExp('\\\\b'+v.name.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+'\\\\b','g');
+    out = out.replace(re, formatVal(v.value));
+  });
+  return out;
+}
+
+function getWhy(idx){
+  const s=trace[idx]; const prev=idx>0?trace[idx-1]:null;
+  const lines=[];
+  if(s.type==='condition'){
+    const raw = s.extra.code||s.code;
+    const substituted = substituteVars(raw, s.vars);
+    lines.push({k:'Expression', v: escapeHtml(raw)});
+    if(substituted!==raw) lines.push({k:'With current values', v: escapeHtml(substituted)});
+    lines.push({k:'Result', v: `<b style="color:${s.extra.result?'#22e8a8':'#ff5d7a'}">${s.extra.result}</b>`});
+  } else if(s.type==='assign' || s.type==='increment' || s.type==='declare'){
+    const changed = s.vars.filter(v=>{ const p=prev?prev.vars.find(x=>x.name===v.name):null; return !p || JSON.stringify(p.value)!==JSON.stringify(v.value); });
+    if(!changed.length) lines.push({k:'Note', v:'No variable value actually changed on this line.'});
+    changed.forEach(v=>{
+      const p=prev?prev.vars.find(x=>x.name===v.name):null;
+      lines.push({k:v.name, v: `${p?formatVal(p.value):'—'} → ${formatVal(v.value)}`, delta:true});
+    });
+    lines.push({k:'Caused by', v: escapeHtml(s.extra.code||s.code)});
+  } else if(s.type==='call'){
+    lines.push({k:'Function', v: escapeHtml(s.extra.name)});
+    lines.push({k:'Reason', v:'Reached a call expression for this function on the current line.'});
+  } else if(s.type==='return'){
+    lines.push({k:'Returns', v: formatVal(s.extra.value)});
+    lines.push({k:'To', v: escapeHtml(s.extra.fn)});
+  } else if(s.type==='output'){
+    lines.push({k:'Printed', v: escapeHtml(s.extra.text)});
+    lines.push({k:'From', v: escapeHtml(s.code)});
+  } else {
+    lines.push({k:'Line', v: escapeHtml(s.code)});
+  }
+  return lines;
+}
+
+function renderWhyPanel(){
+  const lines=getWhy(cur);
+  document.getElementById('whyPanel').innerHTML = lines.map(l=>`
+    <div class="why-line"><span class="why-k">${l.k}</span><span class="why-v${l.delta?' why-delta':''}">${l.v}</span></div>`).join('');
+}
+document.getElementById('btnWhy').onclick=()=>{
+  whyOpen=!whyOpen;
+  document.getElementById('whyPanel').style.display = whyOpen?'block':'none';
+  document.getElementById('btnWhy').textContent = whyOpen? 'Why did this happen? ▴' : 'Why did this happen? ▾';
+  if(whyOpen) renderWhyPanel();
+};
+
 function renderAI(){
+  document.getElementById('whyRow').style.display = trace.length? 'block':'none';
+  if(whyOpen) renderWhyPanel();
   const target=explain(trace[cur], mentorLevel); const body=document.getElementById('aiBody'); const myToken=++aiTypeToken;
   const chunks=target.split(/(<[^>]+>)/g).filter(x=>x.length);
   body.innerHTML='';
@@ -942,7 +1297,7 @@ function renderAI(){
 }
 
 function renderAll(){
-  renderTimeline(); renderOrb(); renderSatellites(); renderVars(); renderStack(); renderMem(); renderConsole(); renderAI();
+  renderTimeline(); renderOrb(); renderBreadcrumb(); renderSatellites(); renderVars(); renderStack(); renderMem(); renderConsole(); renderAI();
   markExecLine(trace[cur].line);
   document.getElementById('tPrev').style.opacity=cur===0?0.4:1;
   document.getElementById('tNext').style.opacity=cur===trace.length-1?0.4:1;
@@ -975,6 +1330,8 @@ document.querySelectorAll('.mlvl').forEach(el=>{
 });
 
 document.getElementById('icCopy').onclick=()=>{ navigator.clipboard?.writeText(codeInput.value).catch(()=>{}); };
+document.getElementById('svStack').onclick=()=>{ stackView='stack'; document.getElementById('svStack').classList.add('active'); document.getElementById('svTree').classList.remove('active'); if(trace.length) renderStack(); };
+document.getElementById('svTree').onclick=()=>{ stackView='tree'; document.getElementById('svTree').classList.add('active'); document.getElementById('svStack').classList.remove('active'); if(trace.length) renderStack(); };
 document.getElementById('qaDownload').onclick=()=>{ const blob=new Blob([codeInput.value],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='main.js'; a.click(); };
 document.getElementById('qaShare').onclick=()=>{ navigator.clipboard?.writeText(JSON.stringify(trace,null,2)).catch(()=>{}); };
 document.getElementById('qaExample2').onclick=()=>{ codeInput.value=EXAMPLES.fib; syncEditor(); runCode(); };
