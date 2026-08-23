@@ -1,5 +1,4 @@
 # ⚡ CodeSutra
-
 ### Don't just read code. See how it works.
 
 CodeSutra is an interactive code understanding platform that transforms source code into a visual execution experience.
